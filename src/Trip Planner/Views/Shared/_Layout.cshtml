@@ -21,24 +21,18 @@
         </environment>
     </head>
     <body>
+
         <nav class="light-blue darken-3" role="navigation">
             <div class="nav-wrapper container">
-                <a id="logo-container" href="#" class="brand-logo white-text">Logo</a>
-                
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="#modal1" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Sign in</a></li>
-                    <li><a href="#modal2" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a></li>
-                </ul>
+                <a id="logo-container" href="/Home" class="brand-logo white-text">Logo</a>
+            
+                @await Html.PartialAsync("_LoginPartial")
 
-                <ul id="nav-mobile" class="side-nav">
-                    <li><a href="#">Sign in</a></li>
-                    <li><a href="#">Log in</a></li>
-                </ul>
-                <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+
             </div>
         </nav>
 
-        <div id="modal1" class="modal" style="width: 20%">
+        @*<div id="modal1" class="modal" style="width: 20%">
             <div class="modal-content">
                 <div class="row">
                     <form class="col s12">
@@ -84,7 +78,7 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div>*@
 
         @RenderBody()
 
