@@ -3,18 +3,22 @@
 @if (User.Identity.IsAuthenticated)
 {
     <form asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav navbar-right">
+        <ul class="right nav navbar-nav navbar-right">
             <li>
-                <a asp-controller="Manage" asp-action="Index" title="Manage">Hello @User.GetUserName()!</a>
+                <a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a>
             </li>
-            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log off</a></li>
         </ul>
     </form>
 }
 else
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li><a asp-controller="Account" asp-action="Register">Register</a></li>
-        <li><a asp-controller="Account" asp-action="Login">Log in</a></li>
+    <ul class="right nav navbar-nav navbar-right">
+        <li>
+            <a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Register</a>
+        </li>
+        <li>
+        <a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a>
+        </li>
     </ul>
 }
