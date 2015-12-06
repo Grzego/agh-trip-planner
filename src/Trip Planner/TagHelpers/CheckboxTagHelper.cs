@@ -1,27 +1,40 @@
 ﻿using Microsoft.AspNet.Razor.Runtime.TagHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNet.Mvc.Rendering;
 
 namespace Trip_Planner.TagHelpers
 {
-	[HtmlTargetElement("div", Attributes = CheckboxValueAttributeName)]
+	[HtmlTargetElement("input", Attributes = ForAttributeName)]
 	public class CheckboxTagHelper : TagHelper
 	{
-		private const string CheckboxValueAttributeName = "my-checkbox-for";
+		private const string ForAttributeName = "asp-checkbox-for";
 
-		[HtmlAttributeName(CheckboxValueAttributeName)]
-		public string CheckboxName { get; set; }
+	    [HtmlAttributeName(ForAttributeName)]
+	    public ModelExpression For { get; set; }
 
-		public override void Process(TagHelperContext context, TagHelperOutput output)
-		{
-			string checkboxContent = $@"<input asp-for='{CheckboxName}' id='{CheckboxName}' type='checkbox' class='filled-in'/>
-										<label for='{CheckboxName}'>{CheckboxName}</label>";
+	    public string Value { get; set; } = "false";
 
-			output.Content.Append(checkboxContent);
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+            output.TagName = "input";
+            output.TagMode = TagMode.SelfClosing;
+            output.Attributes["id"] = For.Name;
+            output.Attributes["value"] = Value;
+            output.Attributes["name"] = For.Name;
+            output.Attributes["data-val"] = Value;
+            output.Attributes["type"] = "checkbox";
 
-			base.Process(context, output);
+            var label = new TagBuilder("label");
+            label.Attributes["for"] = For.Name;
+            label.InnerHtml.Append(For.Metadata.DisplayName);
+            output.PostElement.Append(label);
+
+            var hidden = new TagBuilder("input");
+            hidden.Attributes["type"] = "hidden";
+            hidden.Attributes["value"] = "false";
+            hidden.Attributes["name"] = For.Name;
+            output.PostElement.Append(hidden);
+            
+            base.Process(context, output);
 		}
 	}
 }
