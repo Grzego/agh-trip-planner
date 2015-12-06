@@ -1,7 +1,4 @@
-﻿@using System.Collections.Generic
-@using Microsoft.AspNet.Http
-@using Microsoft.AspNet.Http.Authentication
-@model LoginViewModel
+﻿@model LoginViewModel
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
@@ -14,21 +11,21 @@
         <div class="rows s6">
             <div class="input-field col s12">
                 <i class="material-icons prefix">account_circle</i>
-                <input asp-for="Email" id="email" type="email" class="validate">
-                <label for="email">Email</label>
+                <input asp-for="Email" class="validate">
+                <label asp-for="Email">Email</label>
             </div>
         </div>
         <div class="row s6">
             <div class="input-field col s12">
                 <i class="material-icons prefix">vpn_key</i>
-                <input asp-for="Password" id="password" type="password" class="validate">
-                <label for="password">Password</label>
+                <input asp-for="Password"  class="validate">
+                <label asp-for="Password">Password</label>
             </div>
         </div>
         <div class="row s6">
             <div class="checkbox">
                 <input asp-for="RememberMe" />
-                <label for="RememberMe">Remember</label>
+                <label asp-for="RememberMe">Remember</label>
             </div>
         </div>
         <div>
