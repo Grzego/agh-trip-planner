@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Razor.Runtime.TagHelpers;
-using Microsoft.AspNet.Mvc.Rendering;
+﻿using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNet.Razor.TagHelpers;
 
 namespace Trip_Planner.TagHelpers
 {
