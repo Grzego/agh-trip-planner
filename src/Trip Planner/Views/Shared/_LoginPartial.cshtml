@@ -2,23 +2,27 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <form asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
-        <ul class="right nav navbar-nav navbar-right">
-            <li>
-                <a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a>
-            </li>
-            <li><a href="javascript:document.getElementById('logoutForm').submit()" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log off</a></li>
-        </ul>
-    </form>
+    <ul class="right hide-on-med-and-down">
+        <li><a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a></li>
+        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log out</button></form></li>
+    </ul>
+    
+    <ul id="nav-mobile" class="side-nav">
+        <li><a asp-controller="Manage" asp-action="Index" title="Manage">Hello @User.GetUserName()!</a></li>
+        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="btn-flat">Log out</button></form></li>
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
 }
 else
 {
-    <ul class="right nav navbar-nav navbar-right">
-        <li>
-            <a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Register</a>
-        </li>
-        <li>
-        <a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a>
-        </li>
+    <ul class="right hide-on-med-and-down">
+        <li><a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Sign in</a></li>
+        <li><a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a></li>
     </ul>
+
+    <ul id="nav-mobile" class="side-nav">
+        <li><a asp-controller="Account" asp-action="Register">Sign in</a></li>
+        <li><a asp-controller="Account" asp-action="Login">Log in</a></li>
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
 }

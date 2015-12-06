@@ -1,4 +1,6 @@
-﻿@{
+﻿@using System.Security.Claims
+
+@{
     ViewData["Title"] = "Trip Planner";
 }
 
@@ -25,7 +27,14 @@
                 <h5 class="header col s12 light">An app for planning trip in any city you want!</h5>
             </div>
             <div class="row center">
-                <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light light-blue darken-3">Get Started</a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="TripMap" asp-action="TripMap" id="download-button" class="btn-large waves-effect waves-light light-blue darken-3">Get Started</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" id="download-button" class="btn-large waves-effect waves-light light-blue darken-3">Get Started</a>
+            }
             </div>
         </div>
     </div>
