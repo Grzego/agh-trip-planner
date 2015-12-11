@@ -6,6 +6,11 @@
  * Made By MaterializeCSS.com
  */
 
+.collection {
+    font-size: small;
+}
+
+
 nav ul a,
 nav .brand-logo {
   color: #444;

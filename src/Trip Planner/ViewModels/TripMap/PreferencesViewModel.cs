@@ -11,13 +11,15 @@ namespace Trip_Planner.ViewModels.TripMap
     {
         [Display(Name = "Miasto")]
         public String City { get; set; }
-        [Display(Name = "Kluby")]
-        public bool Club { get; set; }
-        [Display(Name = "Zabytki")]
-        public bool Monuments { get; set; }
         [Display(Name = "Data przyjazdu")]
         public DataType BeginTrip { get; set; }
         [Display(Name = "Data wyjazdu")]
         public DataType EndTrip { get; set; }
+        [Display(Name = "Zabytki")]
+        public bool Monuments { get; set; }
+        [Display(Name = "Kluby")]
+        public bool Club { get; set; }
+        [Display(Name = "Kino")]
+        public bool Cinema { get; set; }
     }
 }

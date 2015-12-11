@@ -11,7 +11,6 @@ using Microsoft.Data.Entity;
 using Trip_Planner.Models;
 using Trip_Planner.Services;
 using Trip_Planner.ViewModels.TripMap;
-
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Trip_Planner.Controllers
@@ -21,6 +20,7 @@ namespace Trip_Planner.Controllers
         // GET: /<controller>/
         public IActionResult TripMap()
         {
+           
             return View();
         }
     }
