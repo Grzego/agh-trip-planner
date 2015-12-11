@@ -1,10 +1,13 @@
 ﻿@using System.Security.Claims
+@section Scripts {
+    <script src="~/js/init.js"></script>
+}
 
 @if (User.Identity.IsAuthenticated)
 {
     <ul class="right hide-on-med-and-down">
         <li><a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a></li>
-        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log out</button></form></li>
+        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="white-text btn" style="margin-left:5px; margin-right:5px">Log out</button></form></li>
     </ul>
     
     <ul id="nav-mobile" class="side-nav">
@@ -16,8 +19,10 @@
 else
 {
     <ul class="right hide-on-med-and-down">
-        <li><a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Sign in</a></li>
-        <li><a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a></li>
+        <!--<li><a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Sign in</a></li>-->
+        <!--<li><a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a></li>-->
+        <li><a class="waves-effect waves-light btn modal-trigger-sign-in" href="#modal1">Register_M</a></li>
+        <li><a class="waves-effect waves-light btn modal-trigger-sign-in" href="#modal2">Login_M</a></li>
     </ul>
 
     <ul id="nav-mobile" class="side-nav">
@@ -25,4 +30,24 @@ else
         <li><a asp-controller="Account" asp-action="Login">Log in</a></li>
     </ul>
     <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+
+    <!-- Register_M Structure -->
+    <div id="modal1" class="modal modal-fixed-footer brown lighten-2">
+        <div class="modal-content">
+            @await Html.PartialAsync("RegisterM")
+        </div>
+        @*<div class="modal-footer">
+            <button class="modal-action waves-effect waves-green btn-flat" type="submit">Sign in</button>
+        </div>*@
+    </div>
+    <!-- Login_M Structure -->
+    <div id="modal2" class="modal modal-fixed-footer brown lighten-2">
+        <div class="modal-content">
+            @await Html.PartialAsync("LoginM")
+        </div>
+        @*<div class="modal-footer">
+            <button class="modal-action waves-effect waves-green btn-flat" type="submit">Sign in</button>
+        </div>*@
+    </div>
+        
 }
