@@ -6,10 +6,12 @@
  * Made By MaterializeCSS.com
  */
 
-.collection {
-    font-size: small;
-}
 
+
+.filled-in:checked {
+    background-color: #F1F1F1;
+
+}
 
 nav ul a,
 nav .brand-logo {

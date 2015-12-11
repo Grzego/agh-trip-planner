@@ -21,5 +21,9 @@ namespace Trip_Planner.ViewModels.TripMap
         public bool Club { get; set; }
         [Display(Name = "Kino")]
         public bool Cinema { get; set; }
+        [Display(Name = "Muzeum")]
+        public bool Museum { get; set; }
+        [Display(Name = "Jedzenie")]
+        public bool Food { get; set; }
     }
 }

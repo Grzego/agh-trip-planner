@@ -4,7 +4,6 @@
     <div class="col s2">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form">
             <div class="input-field col s12">
-                
                 <i class="material-icons prefix">room</i>
                 <input asp-for="City" id="icon_prefix" type="text" class="validate">
                 <label asp-for="City" for="icon_prefix"></label>
@@ -13,26 +12,35 @@
                 <i class="tiny material-icons prefix">today</i>
                 <label asp-for="BeginTrip" for="icon_prefix"></label>
                 <input asp-for="BeginTrip" type="date" id="icon_prefix" class="datepicker">
-                <br>
+                <br />
                 <i class="tiny material-icons prefix">today</i>
                 <label asp-for="EndTrip" for="icon_prefix"></label>
                 <input asp-for="EndTrip" type="date" id="icon_prefix" class="datepicker">
-                <br>
+            </div>
 
+            <ul class="collection with-header">
+                <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
+                <li class="collection-item">
+                    <input value="true" class="filled-in" asp-checkbox-for="Monuments"/>
+                    <br />
+                    <input value="true" class="filled-in" asp-checkbox-for="Museum" />
 
-                <ul class="collection">
-                    <li class="collection-item"  >
-                        <span class="title">Zwiedzanie:</span>
-                        <input value="true" class="filled-in red lighten-3" asp-checkbox-for="Monuments" />
-                        <br>
-                        <input value="true" class="filled-in" asp-checkbox-for="Club" />
-                        <br>
-                        <input value="true" class="filled-in" asp-checkbox-for="Cinema" />
-                        <br>
-                    </li>
-                </ul>
-
-          </div>
+                </li>    
+            </ul>
+            <ul class="collection with-header">
+                <li class="collection-header" style="font-size: small; color: #0d47a1;">Rozrywka</li>
+                <li class="collection-item">
+                    <input value="true" class="filled-in" asp-checkbox-for="Club" />
+                    <br />
+                    <input value="true" class="filled-in" asp-checkbox-for="Cinema" />
+                </li>
+            </ul>
+            <ul class="collection with-header">
+                <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
+                <li class="collection-item">
+                    <input value="true" class="filled-in" asp-checkbox-for="Food" />
+                </li>
+            </ul>
 
             
 
