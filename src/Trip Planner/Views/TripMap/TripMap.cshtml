@@ -3,19 +3,20 @@
 <div class="row">
     <div class="col s2">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form">
+            <br /> <!-- Prowizorka -->
             <div class="input-field col s12">
                 <i class="material-icons prefix">room</i>
-                <input asp-for="City" id="icon_prefix" type="text" class="validate">
-                <label asp-for="City" for="icon_prefix"></label>
+                <input asp-for="City" id="city_poc" type="text" class="validate">
+                <label asp-for="City" for="city_poc"></label>
             </div>
             <div class="col s12">
                 <i class="tiny material-icons prefix">today</i>
-                <label asp-for="BeginTrip" for="icon_prefix"></label>
-                <input asp-for="BeginTrip" type="date" id="icon_prefix" class="datepicker">
+                <label asp-for="BeginTrip" for="start_date"></label>
+                <input asp-for="BeginTrip" type="date" id="start_date" class="datepicker">
                 <br />
                 <i class="tiny material-icons prefix">today</i>
-                <label asp-for="EndTrip" for="icon_prefix"></label>
-                <input asp-for="EndTrip" type="date" id="icon_prefix" class="datepicker">
+                <label asp-for="EndTrip" for="end_date"></label>
+                <input asp-for="EndTrip" type="date" id="end_date" class="datepicker">
             </div>
 
             <ul class="collection with-header">
@@ -52,33 +53,136 @@
 </div>  
 
 @section Scripts {
-<script src="https://maps.googleapis.com/maps/api/js"></script>
-<script>
-    function initialize() {
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.22&libraries=places,maps"></script>
+    <script>
+    google.maps.event.addDomListener(window, 'load', function () {
         var mapCanvas = document.getElementById('map');
         var mapOptions = {
-            center: new google.maps.LatLng(44.5403, -78.5463),
-            zoom: 8,
+            center: new google.maps.LatLng(50.0468548, 19.9348337),
+            zoom: 12,
             mapTypeId: google.maps.MapTypeId.ROADMAP
-        }
-        var map = new google.maps.Map(mapCanvas, mapOptions)
-    }
-    google.maps.event.addDomListener(window, 'load', initialize);
+        };
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+
+        var defaultBounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(-90, -180),
+            new google.maps.LatLng(90, 180));
+
+        var autocompleteOptions = {
+            bounds: defaultBounds,
+            types: ['(cities)']
+        };
+
+        var autocomplete = new google.maps.places.Autocomplete(document.getElementById('city_poc'), autocompleteOptions);
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            var place = autocomplete.getPlace();
+            map.panTo(place.geometry.location);
+        });
+
+        var markers = [];
+
+        var directions = new google.maps.DirectionsService();
+        var directionsDisplay = new google.maps.DirectionsRenderer({ map: map });
+
+        $(':checkbox').change(function () {
+            var placeMap = {
+                'Monuments': ['city_hall', 'museum', 'point_of_interest'],
+                'Club': ['bar', 'cafe'],
+                'Food': ['restaurant', 'meal_takeaway'],
+                'Art': ['art_gallery'],
+                'Cinema': ['movie_theater'],
+                'Fun': ['amusement_park', 'zoo']
+            };
+
+            var currentSearch = [];
+            $(':checkbox').each(function () {
+                if (this.checked) {
+                    currentSearch = currentSearch.concat(placeMap[this.id]);
+                }
+            });
+
+            for (var i = 0; i < markers.length; ++i) {
+                markers[i].setMap(null);
+                delete markers[i];
+            }
+
+            markers = [];
+
+            directionsDisplay.setMap(null);
+            directionsDisplay.setDirections(null);
+
+            if (currentSearch.length == 0) {
+                return;
+            }
+
+            var infowindow = new google.maps.InfoWindow();
+            var service = new google.maps.places.PlacesService(map);
+
+            service.nearbySearch({
+                location: autocomplete.getPlace().geometry.location,
+                radius: 2500,
+                types: currentSearch
+            }, function (results, status) {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    var places = results.filter(function (place) {
+                        return place.rating > 4.0;
+                    }).sort(function (a, b) {
+                        return a.rating < b.rating;
+                    }).slice(0, 8);
+
+                    for (var i = 0; i < places.length; ++i) {
+                        var place = places[i];
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location
+                        });
+
+                        markers.push(marker);
+
+                        google.maps.event.addListener(marker, 'click', function () {
+                            infowindow.setContent(place.name);
+                            infowindow.open(map, this);
+                        });
+                    }
+
+                    var waypoints = places.map(function (item) {
+                        return {
+                            location: item.geometry.location.toUrlValue(),
+                            stopover: true
+                        };
+                    });
+
+                    directions.route({
+                        origin: waypoints[0]['location'],
+                        destination: waypoints[waypoints.length-1]['location'],
+                        waypoints: waypoints.slice(1, waypoints.length - 1),
+                        optimizeWaypoints: true,
+                        travelMode: google.maps.TravelMode.WALKING
+                    }, function (response, status) {
+                        if (status == google.maps.DirectionsStatus.OK) {
+                            directionsDisplay.setMap(map);
+                            directionsDisplay.setDirections(response);
+                        }
+                    });
+                }
+            });
+        });
+    });
 
     $('.datepicker').pickadate({
-    selectMonths: true, // Creates a dropdown to control month
-    selectYears: 2, // Creates a dropdown of 15 years to control year
-    monthsFull: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
-    monthsShort: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
-    weekdaysFull: ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
-    weekdaysShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr', 'Czw.', 'Pt.', 'Sob.'],
-    today: 'Dziś',
-    clear: 'Wyczyść',
-    close: 'Zamknij',
-    labelMonthNext: 'Następny miesiąc',
-    labelMonthPrev: 'Poprzedni miesiąc',
-    labelMonthSelect: 'Wybierz miesiąc',
-    labelYearSelect: 'Wybierz rok',
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 2, // Creates a dropdown of 15 years to control year
+        monthsFull: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+        monthsShort: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+        weekdaysFull: ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+        weekdaysShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr', 'Czw.', 'Pt.', 'Sob.'],
+        today: 'Dziś',
+        clear: 'Wyczyść',
+        close: 'Zamknij',
+        labelMonthNext: 'Następny miesiąc',
+        labelMonthPrev: 'Poprzedni miesiąc',
+        labelMonthSelect: 'Wybierz miesiąc',
+        labelYearSelect: 'Wybierz rok',
     });
-</script>
+    </script>
 }
