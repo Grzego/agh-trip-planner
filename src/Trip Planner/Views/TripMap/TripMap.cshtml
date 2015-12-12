@@ -55,7 +55,156 @@
 @section Scripts {
     <script src="https://maps.googleapis.com/maps/api/js?v=3.22&libraries=places,maps"></script>
     <script>
-    google.maps.event.addDomListener(window, 'load', function () {
+        function addToRoad(place) {
+            alert("elo");
+
+        }
+        google.maps.event.addDomListener(window, 'load', function () {
+            $(document).ready(function () {
+                $('.materialboxed').materialbox();
+            });
+            var mapCanvas = document.getElementById('map');
+            var mapOptions = {
+                center: new google.maps.LatLng(50.0468548, 19.9348337),
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(mapCanvas, mapOptions);
+
+            var defaultBounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(-90, -180),
+                new google.maps.LatLng(90, 180));
+
+            var autocompleteOptions = {
+                bounds: defaultBounds,
+                types: ['(cities)']
+            };
+
+            var autocomplete = new google.maps.places.Autocomplete(document.getElementById('city_poc'), autocompleteOptions);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                var place = autocomplete.getPlace();
+                map.panTo(place.geometry.location);
+            });
+
+            var markers = [];
+            var infowindow;
+            var service;
+            var directions = new google.maps.DirectionsService();
+            var directionsDisplay = new google.maps.DirectionsRenderer({ map: map });
+            $(':checkbox').change(function () {
+                var placeMap = {
+                    'Monuments': ['city_hall', 'museum', 'point_of_interest'],
+                    'Club': ['bar', 'cafe'],
+                    'Food': ['restaurant', 'meal_takeaway'],
+                    //'Art': ['art_gallery'],
+                    'Cinema': ['movie_theater'],
+                    //'Fun': ['amusement_park', 'zoo']
+                };
+
+                var currentSearch = [];
+                $(':checkbox').each(function () {
+                    if (this.checked) {
+                        currentSearch = currentSearch.concat(placeMap[this.id]);
+                    }
+                });
+
+                for (var i = 0; i < markers.length; ++i) {
+                    markers[i].setMap(null);
+                    delete markers[i];
+                }
+
+                markers = [];
+
+                directionsDisplay.setMap(null);
+                directionsDisplay.setDirections(null);
+
+                if (currentSearch.length == 0) {
+                    return;
+                }
+
+                infowindow = new google.maps.InfoWindow();
+                service = new google.maps.places.PlacesService(map);
+
+                service.nearbySearch({
+                    location: autocomplete.getPlace().geometry.location,
+                    radius: 2500,
+                    types: currentSearch
+                }, callback);
+
+                function callback(results, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        var places = results.filter(function (place) {
+                            return place.rating > 4.0;
+                        }).sort(function (a, b) {
+                            return a.rating < b.rating;
+                        }).slice(0, 8);
+                        for (var i = 0; i < places.length; i++) {
+                            createMarker(places[i]);
+                        }
+                        var waypoints = places.map(function (item) {
+                            return {
+                                location: item.geometry.location.toUrlValue(),
+                                stopover: true
+                            };
+                        });
+
+                        directions.route({
+                            origin: waypoints[0]['location'],
+                            destination: waypoints[waypoints.length - 1]['location'],
+                            waypoints: waypoints.slice(1, waypoints.length - 1),
+                            optimizeWaypoints: true,
+                            travelMode: google.maps.TravelMode.WALKING
+                        }, function (response, status) {
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsDisplay.setMap(map);
+                                directionsDisplay.setDirections(response);
+                            }
+                        });
+                    }
+                }
+                function createMarker(place) {
+                    var placeLoc = place.geometry.location;
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: place.geometry.location,
+                    });
+
+                    markers.push(marker);
+                    var photos = place.photos;
+                    var request = { reference: place.reference };
+                    service.getDetails(request, function (details, status) {
+                        google.maps.event.addListener(marker, 'click', function () {                          
+                            if (!photos) {
+                                infowindow.setContent("<div>" + "<strong>" + details.name + "</strong>" + "<br />" +
+                                    details.formatted_address + "<br />" +
+                                    details.formatted_phone_number + "<br />" +
+                                    "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                                    "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br />" +
+                                    "</div>"
+                                    );
+                                infowindow.open(map, this);
+                            } else {
+                                var photoURL = photos[0].getUrl({ 'maxWidth': 240, 'maxHeight': 240 });
+                                infowindow.setContent("<div>" + "<strong>" + details.name + "</strong>" + "<br />" +
+                                    details.formatted_address + "<br />" +
+                                    details.formatted_phone_number + "<br />" +
+                                    "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                                    "<img src=" + photoURL + "><br />" +
+                                    "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br />"+
+                                    "<button onClick="+addToRoad(tmpPlace)+">Super</button>" + 
+                                    "</div>"
+                                    );
+                                infowindow.open(map, this);
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
+
+
+        @*google.maps.event.addDomListener(window, 'load', function () {
         var mapCanvas = document.getElementById('map');
         var mapOptions = {
             center: new google.maps.LatLng(50.0468548, 19.9348337),
@@ -167,22 +316,25 @@
                 }
             });
         });
-    });
+    });*@
+        
+        
+ 
 
-    $('.datepicker').pickadate({
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 2, // Creates a dropdown of 15 years to control year
-        monthsFull: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
-        monthsShort: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
-        weekdaysFull: ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
-        weekdaysShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr', 'Czw.', 'Pt.', 'Sob.'],
-        today: 'Dziś',
-        clear: 'Wyczyść',
-        close: 'Zamknij',
-        labelMonthNext: 'Następny miesiąc',
-        labelMonthPrev: 'Poprzedni miesiąc',
-        labelMonthSelect: 'Wybierz miesiąc',
-        labelYearSelect: 'Wybierz rok',
-    });
+        $('.datepicker').pickadate({
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 2, // Creates a dropdown of 15 years to control year
+            monthsFull: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+            monthsShort: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+            weekdaysFull: ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+            weekdaysShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr', 'Czw.', 'Pt.', 'Sob.'],
+            today: 'Dziś',
+            clear: 'Wyczyść',
+            close: 'Zamknij',
+            labelMonthNext: 'Następny miesiąc',
+            labelMonthPrev: 'Poprzedni miesiąc',
+            labelMonthSelect: 'Wybierz miesiąc',
+            labelYearSelect: 'Wybierz rok',
+        });
     </script>
 }
