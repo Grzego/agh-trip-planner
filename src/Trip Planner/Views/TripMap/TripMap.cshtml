@@ -55,10 +55,40 @@
 @section Scripts {
     <script src="https://maps.googleapis.com/maps/api/js?v=3.22&libraries=places,maps"></script>
     <script>
+
+        //ZMIANA: zmienne globalne
+        var map;
+        var i = 0;
         function addToRoad(place) {
             alert("elo");
 
         }
+
+        //ZMIANA: funkcja dodawania markera
+        function addMyMarker(event) {
+            i = i + 1;
+            var myPos = { lat: 0, lng: 0 }
+            var latMy = event.latLng.lat();
+            var lngMy = event.latLng.lng();
+            myPos = { lat: latMy, lng: lngMy }
+            var marker = new google.maps.Marker({
+                position: myPos,
+                map: map,
+                title: "My marker tmp!",
+            });
+            marker.setMap(map);
+            /*
+            According to Info Windows Guidelines,
+                You are advised not to place interactive components — such as buttons, checkboxes, or text inputs — 
+                within your custom info window.
+            -> czyli trochę kappa z takim buttonem
+            */
+            newContent = "Tu mozna dac cos co pokazuje zarcie w poblizu";
+            var infowindow = new google.maps.InfoWindow({ content: "Kappa " + i });
+            infowindow.open(map, marker);
+        }
+
+
         google.maps.event.addDomListener(window, 'load', function () {
             $(document).ready(function () {
                 $('.materialboxed').materialbox();
@@ -69,7 +99,8 @@
                 zoom: 12,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
-            var map = new google.maps.Map(mapCanvas, mapOptions);
+            //ZMIANA: mapa jako zmienna globalna
+            map = new google.maps.Map(mapCanvas, mapOptions);
 
             var defaultBounds = new google.maps.LatLngBounds(
                 new google.maps.LatLng(-90, -180),
@@ -85,6 +116,18 @@
                 var place = autocomplete.getPlace();
                 map.panTo(place.geometry.location);
             });
+
+
+
+
+            //ZMIANA: nowe zdarzenie do dodawania markerów
+            google.maps.event.addListener(map, "rightclick", function (event) {
+                addMyMarker(event);
+            });
+
+
+
+
 
             var markers = [];
             var infowindow;
