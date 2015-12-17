@@ -1,18 +1,20 @@
 ﻿@model PreferencesViewModel
 
-<div class="row">
+<div class="row" id="row1">
 
-    <a class="waves-effect waves-light btn modal-trigger" style="position: fixed; right: 20px; bottom: 10px" href="#modal1">Lista miejsc</a>
+    <!--<a class="waves-effect waves-light btn modal-trigger" style="position: fixed; right: 20px; bottom: 10px" href="#modal1">Lista miejsc</a>
 
     <!-- Modal Structure -->
     <div id="modal1" class="modal bottom-sheet">
         <div class="modal-content">
-            <h4>Modal Header</h4>
-            <p>A bunch of text</p>
+            <h5>Lista miejsc</h5>
+            <ul class="collection" id="listOfPlaces">
+            </ul>
+            
         </div>
-        <div class="modal-footer">
+        <!--<div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" style="position:absolute">Agree</a>
-        </div>
+        </div>-->
     </div>
 
     <div class="col s2">
@@ -73,11 +75,12 @@
         var map = null;
         var infowindow = null;
         var infowindows = []
-        var trip = [];
+        var trip = {};
         var selectedPlaceTypes = [];
         var markers = [];
         var placeService;
         var autocompleteCities;
+        var listButton = null;
 
         function addPlaceToTrip(place)
         {
@@ -171,8 +174,6 @@
                 $(':checkbox').each(function () {
                     if (this.checked) {
                         selectedPlaceTypes = selectedPlaceTypes.concat(placeMap[this.id]);
-
-
                     }
                 });
 
@@ -182,9 +183,42 @@
                 }
                 markers = [];
 
+
+                var parent = document.getElementById("listOfPlaces");
+
+                var numberOfChilds = document.getElementById("listOfPlaces").children.length;
+
+                for (var i = 0; i < numberOfChilds; ++i)
+                {
+                    parent.removeChild(parent.childNodes[0]);
+                    
+                }
+
+                if (listButton != null && selectedPlaceTypes.length == 0) {
+                    document.getElementById("listButton").remove();
+                    listButton = null;
+                }
+
                 if (selectedPlaceTypes.length == 0) {
                     return;
                 }
+                if (listButton == null) {
+                    listButton = document.createElement('a');
+                    document.getElementById("row1").appendChild(listButton);
+                    listButton.id = 'listButton';
+                    listButton.className = 'waves-effect waves-light btn modal-trigger';
+                    listButton.style.position = 'fixed';
+                    listButton.style.right = '20px';
+                    listButton.style.bottom = '10px';
+                    listButton.href = '#modal1';
+                    listButton.innerHTML = 'Lista miejsc';
+                    listButton.onclick = function () {
+                        $('#modal1').openModal({ opacity: 0 });
+                    }
+                }
+                
+
+                
 
                 placeService.nearbySearch({
                     location: autocompleteCities.getPlace().geometry.location,
@@ -198,11 +232,7 @@
                         }
                     }
                 });
-
-                
-
-                    //var listButton = document.getElementById("row").appendChild(document.createElement('a'));
-
+     
             });
 
         }
@@ -216,48 +246,105 @@
             markers.push(marker);
             
             var request = { reference: place.reference };
-            placeService.getDetails(request, function (details, status) {
-                /*<!-- Modal Trigger -->
-                <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
+            placeService.getDetails(request, function (placeDetails, status) {
+                details = placeDetails;
+ 
+                var button = document.createElement('a');
+                var label = document.createElement('label')
+                var icon = document.createElement('i');
+                var photos = place.photos;
+                var photoURL = photos[0].getUrl({ 'maxWidth': 100, 'maxHeight': 100 });
 
-                <!-- Modal Structure -->
-                <div id="modal1" class="modal bottom-sheet">
-                <div class="modal-content">
-                    <h4>Modal Header</h4>
-                    <p>A bunch of text</p>
-                </div>
-                <div class="modal-footer">
-                    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-                </div>
-                </div>*/
+                if (details.name != null) {
+                    var placeItem = document.createElement('li');
+                    placeItem.className = 'collection-item avatar';
+                    document.getElementById("listOfPlaces").appendChild(placeItem);
+                    placeItem.style.fontSize = '12px';
 
-                
+                    var placeAvatar = document.createElement('img');
+                    placeAvatar.className = 'circle';
+                    placeItem.appendChild(placeAvatar);
+
+                    var placeName = document.createElement('span');
+                    placeName.className = 'title';
+                    placeItem.appendChild(placeName);
+
+                    var placeData = document.createElement('p');
+                    placeItem.appendChild(placeData);
+
+                    var button_list = document.createElement('a');
+
+                    var icon_list = document.createElement('i');
+
+                    placeItem.appendChild(button_list);
+                    button_list.appendChild(icon_list);
+                    icon_list.className = 'material-icons';
+
+                    placeName.innerHTML = '<b>'+details.name+'</b>';
+                    placeAvatar.src = photoURL;
+                    placeData.innerHTML = details.formatted_address + "<br />" +
+                                details.formatted_phone_number + "<br />" +
+                                "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                                "Ocena: <span style=color:#01579b;>" + details.rating + "</span>";
+
+
+
+                    if (trip[place.geometry.location] != undefined) {
+                        icon_list.innerHTML = 'done';
+                        button_list.className = "secondary-content btn-floating waves-effect waves-light green"
+
+                        //label.innerHTML = ' Dodano do trasy';
+                    } else {
+                        icon_list.innerHTML = 'add';
+                        button_list.className = "secondary-content btn-floating waves-effect waves-light green"
+
+                        //label.innerHTML = ' Dodaj do trasy';
+                    }
+                }
+
+
+                button_list.onclick = function () {
+                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green';
+                    if (trip[place.geometry.location] != undefined) {
+
+                        delete trip[place.geometry.location];
+                        icon_list.innerHTML = 'add';
+                        //label.innerHTML = ' Dodaj do trasy';
+                    } else {
+
+                        trip[place.geometry.location] = marker;
+                        icon_list.innerHTML = 'done';
+                        //label.innerHTML = ' Dodano do trasy';
+                    }
+                }
+
+                $(button_list).mouseenter(function () {
+                    if (trip[place.geometry.location] != undefined) {
+                        button_list.className = 'secondary-content btn-floating waves-effect waves-light red';
+                        icon_list.innerHTML = 'delete';
+                        //label.innerHTML = ' Usuń z trasy';
+                    }
+                });
+
+                $(button_list).mouseleave(function () {
+                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green';
+
+                    if (trip[place.geometry.location] != undefined) {
+                        icon_list.innerHTML = 'done';
+                        //label.innerHTML = ' Dodano do trasy';
+                    } else {
+                        icon_list.innerHTML = 'add';
+                        //label.innerHTML = ' Dodaj do trasy';
+                    }
+                });
 
                 google.maps.event.addListener(marker, 'click', function () {
                     if (infowindows.length > 0) {
                         infowindows.pop().close();
                     }
 
-                    /*var listButton = document.getElementById("map").appendChild(document.createElement('a'));
-                    listButton.className = 'modal-trigger waves-effect waves-light btn';
-                    listButton.href = '#modal1';
-                    listButton.innerHTML = 'Lista miejsc';
-
-                    var listSheet = document.getElementById("map").appendChild(document.createElement('div'));
-                    listSheet.className = 'modal bottom-sheet';
-                    listSheet.id = 'modal1';
-
-                    var listContent = listSheet.appendChild(document.createElement('div'));
-                    listContent.className = 'modal-content';
-                    listContent.innerHTML = 'elo';*/
-
-                    /*var elo = document.createElement('div');
-                    document.body.appendChild(elo);
-                    elo.innerHTML = "siema";*/
-
-
                     var content = document.createElement('div');
-                    var photos = place.photos;
+                    photos = place.photos;
                     if (!photos) {
                         content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
                             details.formatted_address + "<br />" +
@@ -272,43 +359,26 @@
                                     "<a href=" + details.website + ">" + details.website + "</a><br />" +
                                     "<img width=\"240\" src=" + photoURL + "><br />" +
                                     "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
-                        /* var holder = document.createElement('div');
-                         holder.className = 'material-placeholder';
-                         var img = content.appendChild(document.createElement('img'));
-                         img.className = 'materialboxed initialized';
-                         img.src = photoURL;
-                         img.width = "240";*/
-
                     }
                     
-
-
                     var infowindow = new google.maps.InfoWindow({ content: content, maxWidth: 240 });
 
                     infowindow.open(map, this);
                     infowindows.push(infowindow);
 
-
-                    /*$(document).ready(function () {
-                        $('.materialboxed').materialbox();
-
-                    });*/
-
-
-                    var button;
-                    button = content.appendChild(document.createElement('a'));
+                    content.appendChild(button);
                     button.className = 'btn-floating waves-effect waves-light green';
 
-                    var label;
-                    label = content.appendChild(document.createElement('label'));
+                    content.appendChild(label);
                     label.style.fontSize = "16px";
 
-                    var icon = button.appendChild(document.createElement('i'));
+                    
+                    button.appendChild(icon);
                     icon.className = 'material-icons';
 
-                    if (trip.indexOf(details.name) != -1) {
+                    if (trip[place.geometry.location] != undefined) {
                         icon.innerHTML = 'done';
-                        label.innerHTML = ' Usuń trasy';
+                        label.innerHTML = ' Dodano do trasy';
                     } else {
                         icon.innerHTML = 'add';
                         label.innerHTML = ' Dodaj do trasy';
@@ -316,19 +386,21 @@
 
                     button.onclick = function () {
                         button.className = 'btn-floating waves-effect waves-light green';
-                        if (trip.indexOf(details.name) != -1) {
-                            trip.pop(details.name);
+                        if (trip[place.geometry.location] != undefined) {
+
+                            delete trip[place.geometry.location];
                             icon.innerHTML = 'add';
                             label.innerHTML = ' Dodaj do trasy';
                         } else {
-                            trip.push(details.name);
+
+                            trip[place.geometry.location] = marker;
                             icon.innerHTML = 'done';
                             label.innerHTML = ' Dodano do trasy';
                         }
                     }
 
                     $(button).mouseenter(function () {
-                        if (trip.indexOf(details.name) != -1) {
+                        if (trip[place.geometry.location] != undefined) {
                             button.className = 'btn-floating waves-effect waves-light red';
                             icon.innerHTML = 'delete';
                             label.innerHTML = ' Usuń z trasy';
@@ -338,7 +410,7 @@
                     $(button).mouseleave(function () {
                         button.className = 'btn-floating waves-effect waves-light green';
 
-                        if (trip.indexOf(details.name) != -1) {
+                        if (trip[place.geometry.location] != undefined) {
                             icon.innerHTML = 'done';
                             label.innerHTML = ' Dodano do trasy';
                         } else {
@@ -347,7 +419,13 @@
                         }
                     });
 
+
+
                 });
+
+
+                
+
             });
         }
 
@@ -586,16 +664,6 @@
             });
         });*@
         
-        /*$(document).ready(function () {
-            $('.materialboxed').materialbox();
-        });*/
-        $('.modal-trigger').leanModal({
-            dismissible: true, // Modal can be dismissed by clicking outside of the modal
-            opacity: 0, // Opacity of modal background
-            in_duration: 300, // Transition in duration
-            out_duration: 200, // Transition out duration
-        }
-  );
 
         $('.datepicker').pickadate({
             selectMonths: true, // Creates a dropdown to control month
