@@ -15,7 +15,7 @@
         <!--<div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" style="position:absolute">Agree</a>
         </div>-->
-    </div>
+        </div>
 
     <div class="col s2">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form">
@@ -74,12 +74,15 @@
     <script>
         var map = null;
         var infowindow = null;
-        var infowindows = []
         var trip = {};
         var selectedPlaceTypes = [];
         var markers = [];
         var placeService;
         var autocompleteCities;
+        var specMarkers = [];
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var labelIndex = 0;
+        var placeR = 400;
         var listButton = null;
 
         function addPlaceToTrip(place)
@@ -94,8 +97,10 @@
                 position: event.latLng,
                 map: map
             });
-            
-            /*According to Info Windows Guidelines,
+            //ustawione tylko na chwile, jak masz chwile to weźże skasuj tego markera człowieku kappa keepo kappaClaus
+            marker.setVisible(false);
+            /*
+            According to Info Windows Guidelines,
                 You are advised not to place interactive components — such as buttons, checkboxes, or text inputs — 
                 within your custom info window.
             -> czyli trochę kappa z takim buttonem
@@ -106,12 +111,16 @@
             var restaurant = content.appendChild(document.createElement('button'));
             restaurant.innerHTML = 'Odwiedź restauracje';
             restaurant.className = 'waves-effect waves-light btn';
-            restaurant.onclick = findClosestRestaurants;
+            restaurant.onclick = function () {
+                findClosestRestaurants(event)
+            };
 
             var atm = content.appendChild(document.createElement('button'));
             atm.innerHTML = 'Znajdź bankomat';
             atm.className = 'waves-effect waves-light btn';
-            atm.onclick = findClosestAtm;
+            atm.onclick = function () {
+                findClosestAtm(event);
+            }
 
             if (infowindow != null) {
                 infowindow.close();
@@ -216,7 +225,7 @@
                         $('#modal1').openModal({ opacity: 0 });
                     }
                 }
-                
+
 
                 
 
@@ -232,7 +241,7 @@
                         }
                     }
                 });
-     
+
             });
 
         }
@@ -292,13 +301,15 @@
                     if (trip[place.geometry.location] != undefined) {
                         icon_list.innerHTML = 'done';
                         button_list.className = "secondary-content btn-floating waves-effect waves-light green"
-
+                
                         //label.innerHTML = ' Dodano do trasy';
                     } else {
                         icon_list.innerHTML = 'add';
                         button_list.className = "secondary-content btn-floating waves-effect waves-light green"
 
-                        //label.innerHTML = ' Dodaj do trasy';
+                google.maps.event.addListener(marker, 'click', function () {
+                    if (infowindow != null) {
+                        infowindow.close();
                     }
                 }
 
@@ -361,10 +372,9 @@
                                     "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
                     }
                     
-                    var infowindow = new google.maps.InfoWindow({ content: content, maxWidth: 240 });
 
+                    infowindow = new google.maps.InfoWindow({ content: content, maxWidth: 240 });
                     infowindow.open(map, this);
-                    infowindows.push(infowindow);
 
                     content.appendChild(button);
                     button.className = 'btn-floating waves-effect waves-light green';
@@ -418,32 +428,86 @@
                             label.innerHTML = ' Dodaj do trasy';
                         }
                     });
-
-
-
                 });
-
-
-                
-
             });
         }
 
-
-        function findClosestRestaurants()
+        function delMarkers()
         {
-            /*
-            TODO: piotrek twoja funkcja :P
-            */
+            for (var i = 0; i < specMarkers.length; ++i) {
+                specMarkers[i].setMap(null);
+                delete specMarkers[i];
+            }
+            specMarkers = [];
+        }
+
+
+        function addPlace(place) 
+        {
+
+            var placeLoc = place.geometry.location;
+            var marker = new google.maps.Marker({
+                map: map,
+                position: placeLoc,
+                label: labels[labelIndex++ % labels.length]
+                });
+
+            specMarkers.push(marker);
+            google.maps.event.addListener(marker, 'click', function () {
+                if (infowindow != null) {
+                    infowindow.close();
+                } else {
+                    infowindow = new google.maps.InfoWindow();
+                }
+
+                infowindow.setContent(place.name);
+                infowindow.open(map, this);
+                trip[placeLoc] = marker;
+            });
 
         }
 
-        function findClosestAtm()
-        {
-            /*
-            TODO: i kolejna
-            */
 
+        function findClosestRestaurants(event)
+        {
+            delMarkers();
+            var request = {
+                location: event.latLng,
+                radius: placeR,
+                types: ['restaurant']
+            };
+           
+
+            placeService.nearbySearch(request, function (results, status) {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    for (var i = 0; i < results.length; i++) {
+                        addPlace(results[i]);
+                    }
+                }
+            });
+
+            infowindow.close();
+        }
+
+
+        function findClosestAtm(event)
+        {
+            delMarkers();
+            var request = {
+                location: event.latLng,
+                radius: placeR,
+                types: ['atm']
+            };
+            
+            placeService.nearbySearch(request, function (results, status) {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    for (var i = 0; i < results.length; i++) {
+                        addPlace(results[i]);
+                    }
+                }
+            });
+
+            infowindow.close();
         }
 
 
