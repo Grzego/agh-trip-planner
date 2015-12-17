@@ -1,6 +1,20 @@
 ﻿@model PreferencesViewModel
 
 <div class="row">
+
+    <a class="waves-effect waves-light btn modal-trigger" style="position: fixed; right: 20px; bottom: 10px" href="#modal1">Lista miejsc</a>
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal bottom-sheet">
+        <div class="modal-content">
+            <h4>Modal Header</h4>
+            <p>A bunch of text</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" style="position:absolute">Agree</a>
+        </div>
+    </div>
+
     <div class="col s2">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form">
             <br /> <!-- Prowizorka -->
@@ -58,6 +72,7 @@
     <script>
         var map = null;
         var infowindow = null;
+        var infowindows = []
         var trip = [];
         var selectedPlaceTypes = [];
         var markers = [];
@@ -76,13 +91,13 @@
                 position: event.latLng,
                 map: map
             });
-            /*
-            According to Info Windows Guidelines,
+            
+            /*According to Info Windows Guidelines,
                 You are advised not to place interactive components — such as buttons, checkboxes, or text inputs — 
                 within your custom info window.
             -> czyli trochę kappa z takim buttonem
-            -> wiemy, wiemy ale poki co olac to :D
-            */
+            -> wiemy, wiemy ale poki co olac to :D*/
+            
             var content = document.createElement('div');
 
             var restaurant = content.appendChild(document.createElement('button'));
@@ -156,6 +171,8 @@
                 $(':checkbox').each(function () {
                     if (this.checked) {
                         selectedPlaceTypes = selectedPlaceTypes.concat(placeMap[this.id]);
+
+
                     }
                 });
 
@@ -181,6 +198,11 @@
                         }
                     }
                 });
+
+                
+
+                    //var listButton = document.getElementById("row").appendChild(document.createElement('a'));
+
             });
 
         }
@@ -192,37 +214,139 @@
             });
 
             markers.push(marker);
-            var photos = place.photos;
+            
             var request = { reference: place.reference };
             placeService.getDetails(request, function (details, status) {
+                /*<!-- Modal Trigger -->
+                <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
+
+                <!-- Modal Structure -->
+                <div id="modal1" class="modal bottom-sheet">
+                <div class="modal-content">
+                    <h4>Modal Header</h4>
+                    <p>A bunch of text</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                </div>
+                </div>*/
+
+                
+
                 google.maps.event.addListener(marker, 'click', function () {
-                    if (infowindow != null) {
-                        infowindow.close();
-                    } else {
-                        infowindow = new google.maps.InfoWindow();
+                    if (infowindows.length > 0) {
+                        infowindows.pop().close();
                     }
+
+                    /*var listButton = document.getElementById("map").appendChild(document.createElement('a'));
+                    listButton.className = 'modal-trigger waves-effect waves-light btn';
+                    listButton.href = '#modal1';
+                    listButton.innerHTML = 'Lista miejsc';
+
+                    var listSheet = document.getElementById("map").appendChild(document.createElement('div'));
+                    listSheet.className = 'modal bottom-sheet';
+                    listSheet.id = 'modal1';
+
+                    var listContent = listSheet.appendChild(document.createElement('div'));
+                    listContent.className = 'modal-content';
+                    listContent.innerHTML = 'elo';*/
+
+                    /*var elo = document.createElement('div');
+                    document.body.appendChild(elo);
+                    elo.innerHTML = "siema";*/
+
+
+                    var content = document.createElement('div');
+                    var photos = place.photos;
                     if (!photos) {
-                        infowindow.setContent("<div>" + "<strong>" + details.name + "</strong>" + "<br />" +
+                        content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
                             details.formatted_address + "<br />" +
                             details.formatted_phone_number + "<br />" +
                             "<a href=" + details.website + ">" + details.website + "</a><br />" +
-                            "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br />" +
-                            "</div>"
-                            );
-                        infowindow.open(map, this);
+                            "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
                     } else {
-                        var photoURL = photos[0].getUrl({ 'maxWidth': 240, 'maxHeight': 240 });
-                        infowindow.setContent("<div>" + "<strong>" + details.name + "</strong>" + "<br />" +
-                            details.formatted_address + "<br />" +
-                            details.formatted_phone_number + "<br />" +
-                            "<a href=" + details.website + ">" + details.website + "</a><br />" +
-                            "<img src=" + photoURL + "><br />" +
-                            "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br />" +
-                            //"<button onClick="+addToRoad(tmpPlace)+">Super</button>" + 
-                            "</div>"
-                            );
-                        infowindow.open(map, this);
+                        var photoURL = photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+                        content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
+                                    details.formatted_address + "<br />" +
+                                    details.formatted_phone_number + "<br />" +
+                                    "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                                    "<img width=\"240\" src=" + photoURL + "><br />" +
+                                    "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
+                        /* var holder = document.createElement('div');
+                         holder.className = 'material-placeholder';
+                         var img = content.appendChild(document.createElement('img'));
+                         img.className = 'materialboxed initialized';
+                         img.src = photoURL;
+                         img.width = "240";*/
+
                     }
+                    
+
+
+                    var infowindow = new google.maps.InfoWindow({ content: content, maxWidth: 240 });
+
+                    infowindow.open(map, this);
+                    infowindows.push(infowindow);
+
+
+                    /*$(document).ready(function () {
+                        $('.materialboxed').materialbox();
+
+                    });*/
+
+
+                    var button;
+                    button = content.appendChild(document.createElement('a'));
+                    button.className = 'btn-floating waves-effect waves-light green';
+
+                    var label;
+                    label = content.appendChild(document.createElement('label'));
+                    label.style.fontSize = "16px";
+
+                    var icon = button.appendChild(document.createElement('i'));
+                    icon.className = 'material-icons';
+
+                    if (trip.indexOf(details.name) != -1) {
+                        icon.innerHTML = 'done';
+                        label.innerHTML = ' Usuń trasy';
+                    } else {
+                        icon.innerHTML = 'add';
+                        label.innerHTML = ' Dodaj do trasy';
+                    }
+
+                    button.onclick = function () {
+                        button.className = 'btn-floating waves-effect waves-light green';
+                        if (trip.indexOf(details.name) != -1) {
+                            trip.pop(details.name);
+                            icon.innerHTML = 'add';
+                            label.innerHTML = ' Dodaj do trasy';
+                        } else {
+                            trip.push(details.name);
+                            icon.innerHTML = 'done';
+                            label.innerHTML = ' Dodano do trasy';
+                        }
+                    }
+
+                    $(button).mouseenter(function () {
+                        if (trip.indexOf(details.name) != -1) {
+                            button.className = 'btn-floating waves-effect waves-light red';
+                            icon.innerHTML = 'delete';
+                            label.innerHTML = ' Usuń z trasy';
+                        }
+                    });
+
+                    $(button).mouseleave(function () {
+                        button.className = 'btn-floating waves-effect waves-light green';
+
+                        if (trip.indexOf(details.name) != -1) {
+                            icon.innerHTML = 'done';
+                            label.innerHTML = ' Dodano do trasy';
+                        } else {
+                            icon.innerHTML = 'add';
+                            label.innerHTML = ' Dodaj do trasy';
+                        }
+                    });
+
                 });
             });
         }
@@ -462,8 +586,16 @@
             });
         });*@
         
-        
- 
+        /*$(document).ready(function () {
+            $('.materialboxed').materialbox();
+        });*/
+        $('.modal-trigger').leanModal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            opacity: 0, // Opacity of modal background
+            in_duration: 300, // Transition in duration
+            out_duration: 200, // Transition out duration
+        }
+  );
 
         $('.datepicker').pickadate({
             selectMonths: true, // Creates a dropdown to control month
