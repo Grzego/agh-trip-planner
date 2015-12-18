@@ -60,9 +60,9 @@
             </ul>
 
         </form>
-        <div class="col s2">
+        @*<div class="col s2">
             <button class="waves-effect waves-light btn" onclick="generateTripRoute();">Generuj trasę</button>
-        </div>
+        </div>*@
     </div>
     <div class="col s10">
         <div id="map" style="min-height: 500px; min-height: 800px"></div>
@@ -384,7 +384,12 @@
                         marker.set('icon', 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
                     }
 
-                    // generateTripRoute();
+                    // Takie troche na pale ale to tylko test
+                    if (specMarkers.length != 0) {
+                        delSpecMarkers();
+                    }
+
+                    generateTripRoute();
                 }
 
                 $(button).mouseenter(function () {
@@ -577,6 +582,8 @@
 
                 var removeMarkers = function () {
                     if (startPlace != undefined && endPlace != undefined) {
+                        Materialize.toast('Wybierz miejsca i dodaj je do trasy wycieczki.', 10000);
+
                         for (var i = 0; i < seMarkers.length; ++i) {
                             if (seMarkers[i] != startPlace && seMarkers[i] != endPlace) {
                                 seMarkers[i].setMap(null);
@@ -662,6 +669,8 @@
 
         function askForStartAndEndPlace()
         {
+            Materialize.toast('Wbierz skąd chcesz zacząć i gdzie chcesz zakończyć wycieczkę.', 10000);
+
             console.log('Select Start and End');
             /*
             TODO: zaznacz na mapie miejsca takie jak lotnisko i inne
@@ -693,7 +702,7 @@
             */
 
             if (startPlace == null || endPlace == null) {
-                console.log('Start or End place is undefined.');
+                Materialize.toast('Nie wybrano miejsca początkowego lub końcowego wycieczki.', 4000);
                 return;
             }
 
@@ -739,7 +748,10 @@
 
 
             directionsService = new google.maps.DirectionsService();
-            directionsDisplay = new google.maps.DirectionsRenderer({ map: map });
+            directionsDisplay = new google.maps.DirectionsRenderer({
+                map: map,
+                preserveViewport: true,
+            });
 
             //var markers = [];
             //var directions = new google.maps.DirectionsService();
