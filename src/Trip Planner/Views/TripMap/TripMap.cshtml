@@ -188,8 +188,8 @@
         {
             $(':checkbox').change(function () {
                 var placeMap = {
-                    'Monuments': ['city_hall', 'museum', 'point_of_interest'],
-                    'Museum': [],
+                    'Monuments': ['city_hall', 'point_of_interest'],
+                    'Museum': ['museum'],
                     'Club': ['bar', 'cafe'],
                     'Food': ['restaurant', 'meal_takeaway'],
                     //'Art': ['art_gallery'],
@@ -329,6 +329,11 @@
                             "<a href=" + details.website + ">" + details.website + "</a><br />" +
                             "Ocena: <span style=color:#01579b;>" + details.rating + "</span>";
 
+
+
+
+                // -----
+
                 if (infowindow != null) {
                     infowindow.close();
                 } else {
@@ -363,32 +368,37 @@
                 button.appendChild(icon);
                 icon.className = 'material-icons';
 
-                if (trip[place.geometry.location] != undefined) {
-                    icon.innerHTML = 'done';
-                    label.innerHTML = ' Dodano do trasy';
-                } else {
-                    icon.innerHTML = 'add';
-                    label.innerHTML = ' Dodaj do trasy';
-                }
-
-                button.onclick = function () {
-                    button.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                var addRemoveButton = function() {
                     if (trip[place.geometry.location] != undefined) {
-
-                        delete trip[place.geometry.location];
-                        icon.innerHTML = 'add';
-                        label.innerHTML = ' Dodaj do trasy';
-
-                        marker.set('icon', null);
-                    } else {
-
-                        trip[place.geometry.location] = marker;
                         icon.innerHTML = 'done';
                         label.innerHTML = ' Dodano do trasy';
 
-                        // wiem ze wyglada to syfsko xD ale chcialem te na trasie jakos rozroznic :D (feel free to change)
+                        icon_list.innerHTML = 'done';
+                        button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
+                    } else {
+                        icon.innerHTML = 'add';
+                        label.innerHTML = ' Dodaj do trasy';
+
+                        icon_list.innerHTML = 'add';
+                        button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
+                    }
+                };
+                
+                addRemoveButton();
+
+                // -----
+
+                button_list.onclick = function () {
+                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green z-depth-0';
+                    if (trip[place.geometry.location] != undefined) {
+                        delete trip[place.geometry.location];
+                        marker.set('icon', null);
+                    } else {
+                        trip[place.geometry.location] = marker;
                         marker.set('icon', 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
                     }
+
+                    addRemoveButton();
 
                     // Takie troche na pale ale to tylko test
                     if (specMarkers.length != 0) {
@@ -396,7 +406,41 @@
                     }
 
                     generateTripRoute();
-                }
+                };
+
+                $(button_list).mouseenter(function () {
+                    if (trip[place.geometry.location] != undefined) {
+                        button_list.className = 'secondary-content btn-floating waves-effect waves-light red z-depth-0';
+                        icon_list.innerHTML = 'delete';
+                    }
+                });
+
+                $(button_list).mouseleave(function () {
+                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green z-depth-0';
+                    addRemoveButton();
+                });
+
+                // -----
+
+                button.onclick = function () {
+                    button.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                    if (trip[place.geometry.location] != undefined) {
+                        delete trip[place.geometry.location];
+                        marker.set('icon', null);
+                    } else {
+                        trip[place.geometry.location] = marker;
+                        marker.set('icon', 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+                    }
+
+                    addRemoveButton();
+
+                    // Takie troche na pale ale to tylko test
+                    if (specMarkers.length != 0) {
+                        delSpecMarkers();
+                    }
+
+                    generateTripRoute();
+                };
 
                 $(button).mouseenter(function () {
                     if (trip[place.geometry.location] != undefined) {
@@ -408,24 +452,9 @@
 
                 $(button).mouseleave(function () {
                     button.className = 'btn-floating waves-effect waves-light green z-depth-0';
-                    if (trip[place.geometry.location] != undefined) {
-                        icon.innerHTML = 'done';
-                        label.innerHTML = ' Dodano do trasy';
-                    } else {
-                        icon.innerHTML = 'add';
-                        label.innerHTML = ' Dodaj do trasy';
-                    }
+                    addRemoveButton();
                 });
 
-                if (trip[place.geometry.location] != undefined) {
-                    icon_list.innerHTML = 'done';
-                    button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
-
-                    label.innerHTML = ' Dodano do trasy';
-                } else {
-                    icon_list.innerHTML = 'add';
-                    button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
-                }
 
                 infowindow.setContent(content);
                 infowindow.set('maxWidth', 240);
@@ -588,14 +617,15 @@
 
                 var removeMarkers = function () {
                     if (startPlace != undefined && endPlace != undefined) {
+                        infowindow.close();
+
                         Materialize.toast('Wybierz miejsca i dodaj je do trasy wycieczki.', 10000);
                         // to sie wykonuje po wybraniu miejsca startowego i koncowego
 
                         var searchInput = document.createElement('input');
                         searchInput.type = 'text';
                         searchInput.id = 'place-poc';
-                        searchInput.className = 'controls';
-                        searchInput.style = 'background-color: #FFFFFFFF !important;';
+                        searchInput.className = 'controls white';
 
                         map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchInput);
 
