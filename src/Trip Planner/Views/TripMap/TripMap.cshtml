@@ -80,10 +80,13 @@
         var seMarkers = [];
         var placeService;
         var autocompleteCities;
+        var autocompletePlaces;
         var specMarkers = [];
         var labelIndex = 0;
         var placeRadius = 400;
         var listButton = null;
+
+        var specialMarker;
 
         var directionsService;
         var directionsDisplay;
@@ -225,9 +228,12 @@
                     listButton = null;
                 }
 
+                autocompletePlaces.setTypes(selectedPlaceTypes);
+
                 if (selectedPlaceTypes.length == 0) {
                     return;
                 }
+
                 if (listButton == null) {
                     listButton = document.createElement('a');
                     document.getElementById("row1").appendChild(listButton);
@@ -583,6 +589,41 @@
                 var removeMarkers = function () {
                     if (startPlace != undefined && endPlace != undefined) {
                         Materialize.toast('Wybierz miejsca i dodaj je do trasy wycieczki.', 10000);
+                        // to sie wykonuje po wybraniu miejsca startowego i koncowego
+
+                        var searchInput = document.createElement('input');
+                        searchInput.type = 'text';
+                        searchInput.id = 'place-poc';
+                        searchInput.className = 'controls';
+                        searchInput.style = 'background-color: #FFFFFFFF !important;';
+
+                        map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchInput);
+
+                        autocompletePlaces = new google.maps.places.Autocomplete(searchInput, {
+                            location: autocompleteCities.getPlace().location,
+                            radius: 10000,
+                        });
+                        autocompletePlaces.bindTo('bounds', map); // prawdopodobnie bedzie trzeba zmienic na obszar wybranego miasta
+                        autocompletePlaces.setTypes([]);
+
+                        google.maps.event.addListener(autocompletePlaces, 'place_changed', function () {
+                            var place = autocompletePlaces.getPlace();
+                            map.panTo(place.geometry.location);
+
+                            if (specialMarker != undefined) {
+                                specialMarker.setMap(null);
+                                delete specialMarker;
+                            }
+                            var specialMarker = new google.maps.Marker({
+                                map: map,
+                                position: place.geometry.location,
+                            });
+
+                            placeDetailInfo(place, specialMarker);
+
+                            searchInput.value = '';
+                        });
+                        // -----
 
                         for (var i = 0; i < seMarkers.length; ++i) {
                             if (seMarkers[i] != startPlace && seMarkers[i] != endPlace) {
