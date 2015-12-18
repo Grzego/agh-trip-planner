@@ -77,13 +77,21 @@
         var trip = {};
         var selectedPlaceTypes = [];
         var markers = [];
+        var seMarkers = [];
         var placeService;
         var autocompleteCities;
         var specMarkers = [];
-        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         var labelIndex = 0;
-        var placeR = 400;
+        var placeRadius = 400;
         var listButton = null;
+
+        var directionsService;
+        var directionsDisplay;
+
+        var startPlace = undefined; // marker z wlasnym 'click'iem 
+        var endPlace = undefined;
+
+        // -----
 
         function addPlaceToTrip(place)
         {
@@ -93,11 +101,15 @@
 
         function showOptions(event)
         {
+            if (specMarkers.length != 0) {
+                delSpecMarkers();
+            }
+
             var marker = new google.maps.Marker({
                 position: event.latLng,
                 map: map
             });
-            //ustawione tylko na chwile, jak masz chwile to weźże skasuj tego markera człowieku kappa keepo kappaClaus
+            //ustawione tylko na chwile, jak masz chwile to weźże skasuj tego markera człowieku kappa keepo kappaClaus (prawilnie)
             marker.setVisible(false);
             /*
             According to Info Windows Guidelines,
@@ -145,6 +157,7 @@
             placeService = new google.maps.places.PlacesService(map);
         }
 
+
         function setupCitiesAutocomplete()
         {
             var defaultBounds = new google.maps.LatLngBounds(
@@ -160,6 +173,8 @@
             google.maps.event.addListener(autocompleteCities, 'place_changed', function () {
                 var place = autocompleteCities.getPlace();
                 map.panTo(place.geometry.location);
+
+                askForStartAndEndPlace();
             });
         }
 
@@ -187,8 +202,10 @@
                 });
 
                 for (var i = 0; i < markers.length; ++i) {
-                    markers[i].setMap(null);
-                    delete markers[i];
+                    if (trip[markers[i].position] == undefined) {
+                        markers[i].setMap(null);
+                        delete markers[i];
+                    }
                 }
                 markers = [];
 
@@ -226,9 +243,6 @@
                     }
                 }
 
-
-                
-
                 placeService.nearbySearch({
                     location: autocompleteCities.getPlace().geometry.location,
                     radius: 5000,
@@ -237,7 +251,7 @@
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
                         var places = results;
                         for (var i = 0; i < places.length; i++) {
-                            placeDetailInfo(places[i]);
+                            placeMark(places[i]);
                         }
                     }
                 });
@@ -246,146 +260,143 @@
 
         }
 
-        function placeDetailInfo(place) {
+        function placeMark(place)
+        {
+            if (trip[place.geometry.location] != undefined) {
+                return;
+            }
+
             var marker = new google.maps.Marker({
                 map: map,
                 position: place.geometry.location,
             });
 
             markers.push(marker);
-            
-            var request = { reference: place.reference };
-            placeService.getDetails(request, function (placeDetails, status) {
-                details = placeDetails;
- 
+
+            google.maps.event.addListener(marker, 'click', function () {
+                placeDetailInfo(place, this);
+            });
+        }
+
+        function placeDetailInfo(place, marker)
+        {
+            var request = { placeId: place.place_id };
+            placeService.getDetails(request, function (details, status) {
+                console.log(status);
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                    return;
+                }
+
                 var button = document.createElement('a');
                 var label = document.createElement('label')
                 var icon = document.createElement('i');
                 var photos = place.photos;
-                var photoURL = photos[0].getUrl({ 'maxWidth': 100, 'maxHeight': 100 });
+                var photoURL = photos ? photos[0].getUrl({ 'maxWidth': 100, 'maxHeight': 100 }) : null;
 
-                if (details.name != null) {
-                    var placeItem = document.createElement('li');
-                    placeItem.className = 'collection-item avatar';
-                    document.getElementById("listOfPlaces").appendChild(placeItem);
-                    placeItem.style.fontSize = '12px';
+                var placeItem = document.createElement('li');
+                placeItem.className = 'collection-item avatar';
+                document.getElementById("listOfPlaces").appendChild(placeItem);
+                placeItem.style.fontSize = '12px';
 
-                    var placeAvatar = document.createElement('img');
-                    placeAvatar.className = 'circle';
-                    placeItem.appendChild(placeAvatar);
+                var placeAvatar = document.createElement('img');
+                placeAvatar.className = 'circle';
+                placeAvatar.src = photoURL;
+                placeItem.appendChild(placeAvatar);
 
-                    var placeName = document.createElement('span');
-                    placeName.className = 'title';
-                    placeItem.appendChild(placeName);
+                var placeName = document.createElement('span');
+                placeName.className = 'title';
+                placeItem.appendChild(placeName);
 
-                    var placeData = document.createElement('p');
-                    placeItem.appendChild(placeData);
+                var placeData = document.createElement('p');
+                placeItem.appendChild(placeData);
 
-                    var button_list = document.createElement('a');
+                var button_list = document.createElement('a');
+                var icon_list = document.createElement('i');
 
-                    var icon_list = document.createElement('i');
+                placeItem.appendChild(button_list);
+                button_list.appendChild(icon_list);
+                icon_list.className = 'material-icons';
 
-                    placeItem.appendChild(button_list);
-                    button_list.appendChild(icon_list);
-                    icon_list.className = 'material-icons';
+                placeName.innerHTML = '<b>' + details.name + '</b>';
+                placeData.innerHTML = details.formatted_address + "<br />" +
+                            details.formatted_phone_number + "<br />" +
+                            "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                            "Ocena: <span style=color:#01579b;>" + details.rating + "</span>";
 
-                    placeName.innerHTML = '<b>'+details.name+'</b>';
-                    placeAvatar.src = photoURL;
-                    placeData.innerHTML = details.formatted_address + "<br />" +
-                                details.formatted_phone_number + "<br />" +
-                                "<a href=" + details.website + ">" + details.website + "</a><br />" +
-                                "Ocena: <span style=color:#01579b;>" + details.rating + "</span>";
-
-
-
-                    if (trip[place.geometry.location] != undefined) {
-                        icon_list.innerHTML = 'done';
-                        button_list.className = "secondary-content btn-floating waves-effect waves-light green"
-                
-                        //label.innerHTML = ' Dodano do trasy';
-                    } else {
-                        icon_list.innerHTML = 'add';
-                        button_list.className = "secondary-content btn-floating waves-effect waves-light green"
-
-                google.maps.event.addListener(marker, 'click', function () {
-                    if (infowindow != null) {
-                        infowindow.close();
-                    }
+                if (infowindow != null) {
+                    infowindow.close();
+                } else {
+                    infowindow = new google.maps.InfoWindow();
                 }
 
+                var content = document.createElement('div');
+                photos = place.photos;
+                if (!photos) {
+                    content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
+                        details.formatted_address + "<br />" +
+                        details.formatted_phone_number + "<br />" +
+                        "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                        "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
+                } else {
+                    var photoURL = photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+                    content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
+                                details.formatted_address + "<br />" +
+                                details.formatted_phone_number + "<br />" +
+                                "<a href=" + details.website + ">" + details.website + "</a><br />" +
+                                "<img width=\"240\" src=" + photoURL + "><br />" +
+                                "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
+                }
 
-                button_list.onclick = function () {
-                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green';
+                content.appendChild(button);
+                button.className = 'btn-floating waves-effect waves-light green z-depth-0';
+
+                content.appendChild(label);
+                label.style.fontSize = "16px";
+
+
+                button.appendChild(icon);
+                icon.className = 'material-icons';
+
+                if (trip[place.geometry.location] != undefined) {
+                    icon.innerHTML = 'done';
+                    label.innerHTML = ' Dodano do trasy';
+                } else {
+                    icon.innerHTML = 'add';
+                    label.innerHTML = ' Dodaj do trasy';
+                }
+
+                button.onclick = function () {
+                    button.className = 'btn-floating waves-effect waves-light green z-depth-0';
                     if (trip[place.geometry.location] != undefined) {
 
                         delete trip[place.geometry.location];
-                        icon_list.innerHTML = 'add';
-                        //label.innerHTML = ' Dodaj do trasy';
+                        icon.innerHTML = 'add';
+                        label.innerHTML = ' Dodaj do trasy';
+
+                        marker.set('icon', null);
                     } else {
 
                         trip[place.geometry.location] = marker;
-                        icon_list.innerHTML = 'done';
-                        //label.innerHTML = ' Dodano do trasy';
+                        icon.innerHTML = 'done';
+                        label.innerHTML = ' Dodano do trasy';
+
+                        // wiem ze wyglada to syfsko xD ale chcialem te na trasie jakos rozroznic :D (feel free to change)
+                        marker.set('icon', 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
                     }
+
+                    // generateTripRoute();
                 }
 
-                $(button_list).mouseenter(function () {
+                $(button).mouseenter(function () {
                     if (trip[place.geometry.location] != undefined) {
-                        button_list.className = 'secondary-content btn-floating waves-effect waves-light red';
-                        icon_list.innerHTML = 'delete';
-                        //label.innerHTML = ' Usuń z trasy';
+                        button.className = 'btn-floating waves-effect waves-light red z-depth-0';
+                        icon.innerHTML = 'delete';
+                        label.innerHTML = ' Usuń z trasy';
                     }
                 });
 
-                $(button_list).mouseleave(function () {
-                    button_list.className = 'secondary-content btn-floating waves-effect waves-light green';
-
-                    if (trip[place.geometry.location] != undefined) {
-                        icon_list.innerHTML = 'done';
-                        //label.innerHTML = ' Dodano do trasy';
-                    } else {
-                        icon_list.innerHTML = 'add';
-                        //label.innerHTML = ' Dodaj do trasy';
-                    }
-                });
-
-                google.maps.event.addListener(marker, 'click', function () {
-                    if (infowindows.length > 0) {
-                        infowindows.pop().close();
-                    }
-
-                    var content = document.createElement('div');
-                    photos = place.photos;
-                    if (!photos) {
-                        content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
-                            details.formatted_address + "<br />" +
-                            details.formatted_phone_number + "<br />" +
-                            "<a href=" + details.website + ">" + details.website + "</a><br />" +
-                            "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
-                    } else {
-                        var photoURL = photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
-                        content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
-                                    details.formatted_address + "<br />" +
-                                    details.formatted_phone_number + "<br />" +
-                                    "<a href=" + details.website + ">" + details.website + "</a><br />" +
-                                    "<img width=\"240\" src=" + photoURL + "><br />" +
-                                    "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />";
-                    }
-                    
-
-                    infowindow = new google.maps.InfoWindow({ content: content, maxWidth: 240 });
-                    infowindow.open(map, this);
-
-                    content.appendChild(button);
-                    button.className = 'btn-floating waves-effect waves-light green';
-
-                    content.appendChild(label);
-                    label.style.fontSize = "16px";
-
-                    
-                    button.appendChild(icon);
-                    icon.className = 'material-icons';
-
+                $(button).mouseleave(function () {
+                    button.className = 'btn-floating waves-effect waves-light green z-depth-0';
                     if (trip[place.geometry.location] != undefined) {
                         icon.innerHTML = 'done';
                         label.innerHTML = ' Dodano do trasy';
@@ -393,76 +404,49 @@
                         icon.innerHTML = 'add';
                         label.innerHTML = ' Dodaj do trasy';
                     }
-
-                    button.onclick = function () {
-                        button.className = 'btn-floating waves-effect waves-light green';
-                        if (trip[place.geometry.location] != undefined) {
-
-                            delete trip[place.geometry.location];
-                            icon.innerHTML = 'add';
-                            label.innerHTML = ' Dodaj do trasy';
-                        } else {
-
-                            trip[place.geometry.location] = marker;
-                            icon.innerHTML = 'done';
-                            label.innerHTML = ' Dodano do trasy';
-                        }
-                    }
-
-                    $(button).mouseenter(function () {
-                        if (trip[place.geometry.location] != undefined) {
-                            button.className = 'btn-floating waves-effect waves-light red';
-                            icon.innerHTML = 'delete';
-                            label.innerHTML = ' Usuń z trasy';
-                        }
-                    });
-
-                    $(button).mouseleave(function () {
-                        button.className = 'btn-floating waves-effect waves-light green';
-
-                        if (trip[place.geometry.location] != undefined) {
-                            icon.innerHTML = 'done';
-                            label.innerHTML = ' Dodano do trasy';
-                        } else {
-                            icon.innerHTML = 'add';
-                            label.innerHTML = ' Dodaj do trasy';
-                        }
-                    });
                 });
+
+                if (trip[place.geometry.location] != undefined) {
+                    icon_list.innerHTML = 'done';
+                    button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
+
+                    label.innerHTML = ' Dodano do trasy';
+                } else {
+                    icon_list.innerHTML = 'add';
+                    button_list.className = "secondary-content btn-floating waves-effect waves-light green z-depth-0"
+                }
+
+                infowindow.setContent(content);
+                infowindow.set('maxWidth', 240);
+                infowindow.open(map, marker);
             });
         }
 
-        function delMarkers()
+        function delSpecMarkers()
         {
             for (var i = 0; i < specMarkers.length; ++i) {
-                specMarkers[i].setMap(null);
-                delete specMarkers[i];
+                if (trip[specMarkers[i].position] == undefined) {
+                    specMarkers[i].setMap(null);
+                    delete specMarkers[i];
+                }
             }
             specMarkers = [];
         }
 
 
-        function addPlace(place) 
+        function addOptionalPlace(place) 
         {
 
             var placeLoc = place.geometry.location;
             var marker = new google.maps.Marker({
                 map: map,
                 position: placeLoc,
-                label: labels[labelIndex++ % labels.length]
-                });
+                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            });
 
             specMarkers.push(marker);
             google.maps.event.addListener(marker, 'click', function () {
-                if (infowindow != null) {
-                    infowindow.close();
-                } else {
-                    infowindow = new google.maps.InfoWindow();
-                }
-
-                infowindow.setContent(place.name);
-                infowindow.open(map, this);
-                trip[placeLoc] = marker;
+                placeDetailInfo(place, marker);
             });
 
         }
@@ -470,10 +454,10 @@
 
         function findClosestRestaurants(event)
         {
-            delMarkers();
+            delSpecMarkers();
             var request = {
                 location: event.latLng,
-                radius: placeR,
+                radius: placeRadius,
                 types: ['restaurant']
             };
            
@@ -481,7 +465,7 @@
             placeService.nearbySearch(request, function (results, status) {
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; i < results.length; i++) {
-                        addPlace(results[i]);
+                        addOptionalPlace(results[i]);
                     }
                 }
             });
@@ -492,17 +476,17 @@
 
         function findClosestAtm(event)
         {
-            delMarkers();
+            delSpecMarkers();
             var request = {
                 location: event.latLng,
-                radius: placeR,
+                radius: placeRadius,
                 types: ['atm']
             };
             
             placeService.nearbySearch(request, function (results, status) {
-                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; i < results.length; i++) {
-                        addPlace(results[i]);
+                        addOptionalPlace(results[i]);
                     }
                 }
             });
@@ -512,11 +496,231 @@
 
 
 
+        function startEndPointDetailsInfo(place, marker) {
+            var request = { placeId: place.place_id };
+            placeService.getDetails(request, function (details, status) {
+                console.log(status);
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                    return;
+                }
+
+                if (infowindow != null) {
+                    infowindow.close();
+                } else {
+                    infowindow = new google.maps.InfoWindow();
+                }
+
+                var content = document.createElement('div');
+                photos = place.photos;
+                if (!photos) {
+                    content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
+                        (details.formatted_address ? details.formatted_address + "<br />" : "") +
+                        (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
+                        (details.website ? "<a href=" + details.website + ">" + details.website + "</a>" : "");
+                } else {
+                    var photoURL = photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+                    content.innerHTML = "<strong>" + details.name + "</strong>" + "<br />" +
+                                (details.formatted_address ? details.formatted_address + "<br />" : "") +
+                                (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
+                                (details.website ? "<a href=" + details.website + ">" + details.website + "</a>" : "") +
+                                "<img width=\"240\" src=" + photoURL + "/>";
+                }
+
+                var iconStart = document.createElement('i');
+                iconStart.className = 'material-icons';
+
+                var iconEnd = document.createElement('i');
+                iconEnd.className = 'material-icons';
+
+                var startBtn = document.createElement('a');
+                startBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                startBtn.appendChild(iconStart);
+
+                var endBtn = document.createElement('a');
+                endBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                endBtn.appendChild(iconEnd);
+
+                content.appendChild(document.createElement('br'));
+
+                content.appendChild(startBtn);
+                var labelStart = document.createElement('label');
+                labelStart.style.fontSize = "16px";
+                content.appendChild(labelStart);
+
+                content.appendChild(document.createElement('br'));
+
+                content.appendChild(endBtn);
+                var labelEnd = document.createElement('label');
+                labelEnd.style.fontSize = "16px";
+                content.appendChild(labelEnd);
+                
+
+                var reStartLabel = function () {
+                    if (startPlace == marker) {
+                        iconStart.innerHTML = 'done';
+                        labelStart.innerHTML = ' Ustalony punkt startowy';
+                    } else {
+                        iconStart.innerHTML = 'add';
+                        labelStart.innerHTML = ' Ustaw jako punkt startowy';
+                    }
+                };
+
+                var reEndLabel = function () {
+                    if (endPlace == marker) {
+                        iconEnd.innerHTML = 'done';
+                        labelEnd.innerHTML = ' Ustalony punkt końcowy';
+                    } else {
+                        iconEnd.innerHTML = 'add';
+                        labelEnd.innerHTML = ' Ustaw jako punkt końcowy';
+                    }
+                };
+
+                var removeMarkers = function () {
+                    if (startPlace != undefined && endPlace != undefined) {
+                        for (var i = 0; i < seMarkers.length; ++i) {
+                            if (seMarkers[i] != startPlace && seMarkers[i] != endPlace) {
+                                seMarkers[i].setMap(null);
+                                delete seMarkers[i];
+                            }
+                        }
+                        seMarkers = [];
+                    }
+                };
+
+                reStartLabel();
+                reEndLabel();                
+
+                startBtn.onclick = function () {
+                    startBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                    if (startPlace != undefined) {
+                        startPlace = undefined;
+                    } else {
+                        startPlace = marker;
+                    }
+                    reStartLabel();
+                    removeMarkers();
+                }
+
+                $(startBtn).mouseenter(function () {
+                    if (startPlace == marker) {
+                        startBtn.className = 'btn-floating waves-effect waves-light red z-depth-0';
+                        iconStart.innerHTML = 'delete';
+                        labelStart.innerHTML = ' Usuń punkt startowy';
+                    }
+                });
+
+                $(startBtn).mouseleave(function () {
+                    startBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                    reStartLabel();
+                });
+
+                // -----
+
+                endBtn.onclick = function () {
+                    endBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                    if (endPlace != undefined) {
+                        endPlace = undefined;
+                    } else {
+                        endPlace = marker;
+                    }
+                    reEndLabel();
+                    removeMarkers();
+                }
+
+                $(endBtn).mouseenter(function () {
+                    if (endPlace == marker) {
+                        endBtn.className = 'btn-floating waves-effect waves-light red z-depth-0';
+                        iconEnd.innerHTML = 'delete';
+                        labelEnd.innerHTML = ' Usuń punkt końcowy';
+                    }
+                });
+
+                $(endBtn).mouseleave(function () {
+                    endBtn.className = 'btn-floating waves-effect waves-light green z-depth-0';
+                    reEndLabel();
+                });
+
+                infowindow.setContent(content);
+                infowindow.set('maxWidth', 240);
+                infowindow.open(map, marker);
+            });
+        }
+
+        function addStartEndPlace(place)
+        {
+            var marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location
+            });
+
+            seMarkers.push(marker);
+            google.maps.event.addListener(marker, 'click', function () {
+                startEndPointDetailsInfo(place, marker);
+            });
+
+        }
+
+        function askForStartAndEndPlace()
+        {
+            console.log('Select Start and End');
+            /*
+            TODO: zaznacz na mapie miejsca takie jak lotnisko i inne
+                  zwiazane z roznymi rodzajami transportu
+                 > po kliknieciu na takie miejsce ma bys opcja ustawienia go jako punkt startowy/koncowy 
+                 > klikniecie w dowolnym miejscu na mapie tez pozwala wybrac je jako punkt startowy/koncowy
+            */
+
+            var request = {
+                location: autocompleteCities.getPlace().geometry.location,
+                radius: 5000,
+                types: ['airport', 'bus_station', 'subway_station', 'train_station']
+            };
+
+            placeService.nearbySearch(request, function (results, status) {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    for (var i = 0; i < results.length; ++i) {
+                        addStartEndPlace(results[i]);
+                    }
+                }
+            });
+        }
+
+
         function generateTripRoute()
         {
             /*
-            TODO: grzesiek twoja funkcja :D (nie ma to jak pisac do samego siebie)
+            WARNING: podstawowe api pozwala na 8 punktow (wliczajac start i koniec) :/
             */
+
+            if (startPlace == null || endPlace == null) {
+                console.log('Start or End place is undefined.');
+                return;
+            }
+
+            var places = [];
+            for (var k in trip) {
+                places.push(k);
+            }
+
+            var waypoints = places.map(function (item) {
+                return {
+                    location: item,
+                    stopover: true
+                };
+            });
+
+            directionsService.route({
+                origin: startPlace.position,
+                destination: endPlace.position,
+                waypoints: waypoints,
+                optimizeWaypoints: true,
+                travelMode: google.maps.TravelMode.WALKING
+            }, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setMap(map);
+                    directionsDisplay.setDirections(response);
+                }
+            });
 
         }
 
@@ -533,6 +737,9 @@
 
             setupCheckboxListener();
 
+
+            directionsService = new google.maps.DirectionsService();
+            directionsDisplay = new google.maps.DirectionsRenderer({ map: map });
 
             //var markers = [];
             //var directions = new google.maps.DirectionsService();
