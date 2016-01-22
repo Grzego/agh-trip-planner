@@ -251,7 +251,7 @@
 
                 placeService.nearbySearch({
                     location: autocompleteCities.getPlace().geometry.location,
-                    radius: 5000,
+                    radius: 20000,
                     types: selectedPlaceTypes
                 }, function (results, status) {
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
@@ -740,7 +740,7 @@
 
         function askForStartAndEndPlace()
         {
-            Materialize.toast('Wbierz skąd chcesz zacząć i gdzie chcesz zakończyć wycieczkę.', 10000);
+            Materialize.toast('Wybierz gdzie chcesz zacząć i gdzie chcesz zakończyć wycieczkę.', 10000);
 
             console.log('Select Start and End');
             /*

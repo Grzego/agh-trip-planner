@@ -17,11 +17,26 @@ namespace Trip_Planner.Controllers
 {
     public class TripMapController : Controller
     {
-        // GET: /<controller>/
-        public IActionResult TripMap()
+		private readonly ApplicationDbContext _applicationDbContext;
+
+		public TripMapController(ApplicationDbContext applicationDbContext)
+		{
+			_applicationDbContext = applicationDbContext;
+		}
+
+		// GET: /<controller>/
+		public IActionResult TripMap()
         {
-           
             return View();
         }
+
+		public async Task<IActionResult> SavePath(TripData tripData)
+		{
+			_applicationDbContext.Add(tripData);
+
+			await _applicationDbContext.SaveChangesAsync();
+
+			return Json(new { saved = true });
+		}
     }
 }

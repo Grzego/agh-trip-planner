@@ -9,5 +9,11 @@ namespace Trip_Planner.Models
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
+		public virtual ICollection<TripData> TripDatas { get; set; }
+
+		public ApplicationUser()
+		{
+			TripDatas = new List<TripData>();
+		}
     }
 }
