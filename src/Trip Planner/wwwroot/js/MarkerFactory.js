@@ -20,7 +20,20 @@ var MarkerFactory = function (_services) {
             return new MarkerData(marker, listener, place);
         }
     };
+
+
 };
+
+function convertMarker () {
+    var _lat = arguments[0].position.lat();
+    var _lng = arguments[0].position.lng();
+
+    return {
+        lat: _lat,
+        lng: _lng
+    };
+};
+
 
 var MarkerCollections = function () {
     var markers = {};

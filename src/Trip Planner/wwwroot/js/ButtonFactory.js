@@ -147,4 +147,15 @@ function ButtonFactory() {
             }
         }
     };
+
+    this.hideButton = function() {
+        document.getElementById(arguments[0]).style.visibility = "hidden";
+    };
+
+    this.showButton = function() {
+        document.getElementById(arguments[0]).style.visibility = "visible";
+    };
+
+
+
 }

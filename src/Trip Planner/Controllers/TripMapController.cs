@@ -30,13 +30,15 @@ namespace Trip_Planner.Controllers
             return View();
         }
 
-		public async Task<IActionResult> SavePath(TripData tripData)
+		public async Task<IActionResult> SavePath(TripDataViewModel td_model)
 		{
+            /*
 			_applicationDbContext.Add(tripData);
 
-			await _applicationDbContext.SaveChangesAsync();
+			await _applicationDbContext.SaveChangesAsync();*/
+            Console.WriteLine(td_model);
 
-			return Json(new { saved = true });
+            return Json(new { saved = true });
 		}
     }
 }
