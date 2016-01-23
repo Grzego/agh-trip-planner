@@ -131,8 +131,8 @@ namespace Trip_Planner
                 routes.MapRoute(
                     name: "default",
                     //template: "{controller=Home}/{action=Index}/{id?}");
-                    //template: "{controller=TripMap}/{action=TripMap}/{id?}");
-                    template: "{controller=SavedTrips}/{action=SavedTrips}/{id=123}");
+                    template: "{controller=TripMap}/{action=TripMap}/{id?}");
+                    //template: "{controller=SavedTrips}/{action=SavedTrips}/{id=123}");
 
                 // Uncomment the following line to add a route for porting Web API 2 controllers.
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
