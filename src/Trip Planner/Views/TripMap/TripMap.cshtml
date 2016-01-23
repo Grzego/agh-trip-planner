@@ -59,6 +59,16 @@
                 </li>
             </ul>
 
+
+            <div class="col s12">
+                <p id="savingButton" style="visibility: hidden">
+                    <a class="waves-effect waves-light btn" onclick="app.saveTrip()">
+                    
+                    <i class="material-icons right">play_for_work</i>Zapisz</a>
+                </p>
+            </div>
+
+
         </form>
         @*<div class="col s2">
             <button class="waves-effect waves-light btn" onclick="generateTripRoute();">Generuj trasę</button>
@@ -77,6 +87,10 @@
     <script src="~/js/Services.js"></script>
     <script src="~/js/App.js"></script>
     <script>
+
+
+
+
         var app = null;
 
         // -----
@@ -104,6 +118,13 @@
             labelMonthSelect: 'Wybierz miesiąc',
             labelYearSelect: 'Wybierz rok',
         });
+
+
+
+       
+
+
+
 
     </script>
 }

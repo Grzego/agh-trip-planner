@@ -69,7 +69,9 @@ function App() {
     this.tripGeneration = function () {
         infowindow.close();
 
+        buttonFactory.showButton("savingButton");
         console.log('tripGeneration');
+
         markers.visible('startend', false);
         markers.removeAll('startend');
 
@@ -243,6 +245,34 @@ function App() {
             });
         });
     };
+
+    this.saveTrip = function() {
+        var start = convertMarker(trip.getStart());
+        var end = convertMarker(trip.getEnd());
+        var _waypoints = trip.getWaypoints();
+        var waips = []
+        for (i = 0; i < _waypoints.length; i++) {
+            waips[i] = convertMarker(_waypoints[i]);
+        }
+        $.ajax({
+            type: "POST",
+            url: "TripMap/TripMap/SavePath",
+            data:
+            {
+                'StartPlace': start,
+                'EndPlace': end,
+                'Waypoints': waips
+            },
+            success: function () {
+                console.log("Wysłano do bazy danych");
+            },
+            error: function (blad) {
+                console.log(blad);
+            }
+        });
+    };
+
+
 
     var services = new Services(this.chooseStartEnd);
     var buttonFactory = new ButtonFactory();
