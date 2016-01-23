@@ -1,6 +1,7 @@
-﻿function MarkerData(marker, listener) {
+﻿function MarkerData(marker, listener, place_id) {
     this.marker = marker;
     this.listener = listener;
+    this.place_id = place_id;
 };
 
 var MarkerFactory = function (_services) {
@@ -16,7 +17,7 @@ var MarkerFactory = function (_services) {
             var listener = google.maps.event.addListener(marker, 'click', function () {
                 callback(place, marker);
             });
-            return new MarkerData(marker, listener);
+            return new MarkerData(marker, listener, place.place_id);
         }
     };
 };
@@ -58,6 +59,10 @@ var MarkerCollections = function () {
 
         getCollections: function () {
             return markers;
+        },
+
+        getCollection: function (collection) {
+            return markers[collection];
         }
     };
 }

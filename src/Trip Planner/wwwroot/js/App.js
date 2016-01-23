@@ -235,7 +235,7 @@ function App() {
     var services = new Services(this.chooseStartEnd);
     var buttonFactory = new ButtonFactory();
     var markerFactory = new MarkerFactory(services);
-    var infowindow = new google.maps.InfoWindow();
+    var infowindow = new google.maps.InfoWindow({ maxWidth: 240 });
     var markers = new MarkerCollections();
     var trip = null;
     var self = this;
