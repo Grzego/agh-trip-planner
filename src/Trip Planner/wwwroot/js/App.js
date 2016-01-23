@@ -160,6 +160,18 @@ function App() {
                         });
                     }
                     markers.visible(tid, true);
+
+                    // -----
+
+                    /*var coll = markers.getCollection(tid)
+                    for (var i in coll) {
+                        services.places.detail(coll[i].place, function(content) {
+                            // ...
+                        }
+                    }
+
+                    */
+                    // -----
                 } else {
                     markers.visible(tid, false);
 

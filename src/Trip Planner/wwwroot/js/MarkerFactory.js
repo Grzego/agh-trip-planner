@@ -1,7 +1,7 @@
-﻿function MarkerData(marker, listener, place_id) {
+﻿function MarkerData(marker, listener, place) {
     this.marker = marker;
     this.listener = listener;
-    this.place_id = place_id;
+    this.place = place;
 };
 
 var MarkerFactory = function (_services) {
@@ -17,7 +17,7 @@ var MarkerFactory = function (_services) {
             var listener = google.maps.event.addListener(marker, 'click', function () {
                 callback(place, marker);
             });
-            return new MarkerData(marker, listener, place.place_id);
+            return new MarkerData(marker, listener, place);
         }
     };
 };
