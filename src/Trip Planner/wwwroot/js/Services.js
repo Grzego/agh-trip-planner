@@ -66,8 +66,8 @@ function PlaceServiceProxy(map) {
         },
 
         details: function (place, continuation) {
-            if (_details[place]) {
-                continuation(_details[place]);
+            if (_details[place.place_id]) {
+                continuation(_details[place.place_id]);
             } else {
                 var request = { placeId: place.place_id };
                 placeService.getDetails(request, function (results, status) {
@@ -78,7 +78,7 @@ function PlaceServiceProxy(map) {
 
                     // -----
                     var content = GenerateContent(place, results);
-                    _details[place] = content;
+                    _details[place.place_id] = content;
                     continuation(content);
                 });
             }
