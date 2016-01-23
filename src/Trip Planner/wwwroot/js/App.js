@@ -3,6 +3,34 @@
 /// <reference path="MarkerFactory.ts"/>
 /// <reference path="ButtonFactory.ts"/>
 
+// -----
+function createCard(MarkerData, cardButton) {
+    //var marker = MarkerData.marker;
+    var details = MarkerData.place;
+
+    //tworzenie karty
+    var card = document.createElement("div");
+    card.className = "card small";
+    card.style.Height = "270px";
+
+    if (details.photos) {
+        var photoURL = details.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+        card.innerHTML = "<div class=\"card-image waves-effect waves-block waves-light\">" +
+            "<img class=\"activator\" src=\"" + photoURL + "\"/>" +
+        "</div>";
+    }
+    card.innerHTML += "<div class=\"card-content\" style=\"max-height:60px\">" +
+                "<span class=\"card-title activator grey-text text-darken-4\"><i class=\"material-icons right\">more_vert</i><p style=\"font-size:13px; line-height: 14px\"><b>" + details.name + "</p></b></span>" +
+            "</div>" +
+            "<div class=\"card-reveal\">" +
+                "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i>" + details.name + "</span>" +
+                "<p>Here is some more information about this product that is only revealed once clicked on.</p>" +
+            "</div>";
+    card.appendChild(cardButton.getContent());
+    return card;
+}
+//--------
+
 function App() {
     this.chooseStartEnd = function () {
         console.log('chooseStartEnd');
@@ -10,7 +38,6 @@ function App() {
         markers.visible('trip', false);
 
         trip = new Trip(self.tripGeneration);
-
         services.map.panTo(services.autocomplete.getPlace().geometry.location);
 
         var request = {
@@ -30,9 +57,9 @@ function App() {
                             infodiv.innerHTML = GenerateContent(details);
 
                             var startButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt startowy',
-                                'Ustalony punkt startowy',
-                                'Usuń punkt startowy',
-                                trip.getStart() === marker ? 'done' : 'add');
+                                                                                'Ustalony punkt startowy',
+                                                                                'Usuń punkt startowy',
+                                                                                trip.getStart() === marker ? 'done' : 'add');
                             startButton.onClick(function () {
                                 trip.setStart(trip.getStart() != null ? null : marker);
                             });
@@ -40,9 +67,9 @@ function App() {
                             startButton.mouseLeave();
 
                             var endButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt końcowy',
-                                'Ustalony punkt końcowy',
-                                'Usuń punkt końcowy',
-                                trip.getEnd() === marker ? 'done' : 'add');
+                                                                                'Ustalony punkt końcowy',
+                                                                                'Usuń punkt końcowy',
+                                                                                trip.getEnd() === marker ? 'done' : 'add');
 
                             endButton.onClick(function () {
                                 trip.setEnd(trip.getEnd() != null ? null : marker);
@@ -155,26 +182,43 @@ function App() {
                             if (status === google.maps.places.PlacesServiceStatus.OK) {
                                 for (var i = 0; i < results.length; i++) {
                                     markers.append(tid, self.addToTripMark(results[i]));
+
+                                    var MarkerData = self.addToTripMark(results[i]);
+
+                                    //dodanie buttonow
+                                    var cardButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
+                                                                                    'Dodano do trasy',
+                                                                                    'Usuń z trasy',
+                                                                                    trip.contains(MarkerData.marker) ? 'done' : 'add');
+                                    cardButton.onClick(function () {
+                                        if (!trip.contains(MarkerData.marker)) {
+                                            trip.addPlace(MarkerData.marker);
+                                        } else {
+                                            trip.removePlace(MarkerData.marker);
+                                        }
+                                        trip.setVisible(true);
+                                        self.generateTrip();
+                                    });
+                                    cardButton.mouseEnter();
+                                    cardButton.mouseLeave();
+
+                                    
+                                    //tworzenie karty i dodanie do taba
+                                    var card = createCard(MarkerData, cardButton);
+                                    document.getElementById("placesCards").appendChild(card);
+                                    //---
                                 }
                             }
                         });
+                    } else {
+
                     }
-                    markers.visible(tid, true);
+                    markers.visible(tid, true);                   
+                  //przelaczenie tab
+                    $('ul.tabs').tabs('select_tab', 'placesCards');
 
-                    // -----
-
-                    /*var coll = markers.getCollection(tid)
-                    for (var i in coll) {
-                        services.places.detail(coll[i].place, function(content) {
-                            // ...
-                        }
-                    }
-
-                    */
-                    // -----
                 } else {
                     markers.visible(tid, false);
-
                     // NA PALE xD DO POPRAWY
                     trip.setVisible(true);
                 }
@@ -182,8 +226,6 @@ function App() {
         });
 
     };
-
-    // -----
 
     this.generateTrip = function (/*travelMode*/) {
         console.log('generateTrip');
