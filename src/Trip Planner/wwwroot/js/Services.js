@@ -98,9 +98,10 @@ function GenerateContent(place, details) {
         (details.website ? "<a href=" + details.website + ">" + details.website + "</a>" : "");
     if (place.photos) { // FIX: nie wiedziec czemu nie wczytuje obrazkow
         var photoURL = place.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
-        content += "<img width=\"240\" src=" + photoURL + "/>";
+        console.log(photoURL);
+        content += "<img width=\"240\" src=\"" + photoURL + "\"/>";
     }
-    content += (details.rating ? "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
+    content += (details.rating ? "<br/>Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
     return content;
 };
 
