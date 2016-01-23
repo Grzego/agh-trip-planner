@@ -77,9 +77,8 @@ function PlaceServiceProxy(map) {
                     }
 
                     // -----
-                    var content = GenerateContent(place, results);
-                    _details[place.place_id] = content;
-                    continuation(content);
+                    _details[place.place_id] = results;
+                    continuation(results);
                 });
             }
         }
@@ -89,15 +88,14 @@ function PlaceServiceProxy(map) {
 // -----
 // -----
 
-function GenerateContent(place, details) {
-    console.log('GenerateContent');
+function GenerateContent(details) {
     var content = "";
     content = "<strong>" + details.name + "</strong>" + "<br />" +
         (details.formatted_address ? details.formatted_address + "<br />" : "") +
         (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
         (details.website ? "<a href=" + details.website + ">" + details.website + "</a><br />" : "");
-    if (place.photos) { // FIX: nie wiedziec czemu nie wczytuje obrazkow
-        var photoURL = place.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+    if (details.photos) { // FIX: nie wiedziec czemu nie wczytuje obrazkow
+        var photoURL = details.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
         console.log(photoURL);
         content += "<img width=\"240\" src=\"" + photoURL + "\"/><br />";
     }

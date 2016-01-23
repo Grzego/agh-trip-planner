@@ -25,9 +25,9 @@ function App() {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; ++i) {
                     markers.append('startend', markerFactory.create(results[i], function (place, marker) {
-                        services.places.details(place, function (content) {
+                        services.places.details(place, function (details) {
                             var infodiv = document.createElement('div');
-                            infodiv.innerHTML = content;
+                            infodiv.innerHTML = GenerateContent(details);
 
                             var startButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt startowy',
                                 'Ustalony punkt startowy',
@@ -214,9 +214,9 @@ function App() {
     this.addToTripMark = function (markIt, action) {
         console.log('addToTripMark');
         return markerFactory.create(markIt, function (place, marker) {
-            services.places.details(place, function (content) {
+            services.places.details(place, function (details) {
                 var infodiv = document.createElement('div');
-                infodiv.innerHTML = content;
+                infodiv.innerHTML = GenerateContent(details);
 
                 var placeButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
                     'Dodano do trasy',
