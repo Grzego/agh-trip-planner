@@ -95,13 +95,13 @@ function GenerateContent(place, details) {
     content = "<strong>" + details.name + "</strong>" + "<br />" +
         (details.formatted_address ? details.formatted_address + "<br />" : "") +
         (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
-        (details.website ? "<a href=" + details.website + ">" + details.website + "</a>" : "");
+        (details.website ? "<a href=" + details.website + ">" + details.website + "</a><br />" : "");
     if (place.photos) { // FIX: nie wiedziec czemu nie wczytuje obrazkow
         var photoURL = place.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
         console.log(photoURL);
-        content += "<img width=\"240\" src=\"" + photoURL + "\"/>";
+        content += "<img width=\"240\" src=\"" + photoURL + "\"/><br />";
     }
-    content += (details.rating ? "<br/>Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
+    content += (details.rating ? "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
     return content;
 };
 
