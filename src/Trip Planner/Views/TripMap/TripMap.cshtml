@@ -6,19 +6,9 @@
     <!--<a class="waves-effect waves-light btn modal-trigger" style="position: fixed; right: 20px; bottom: 10px" href="#modal1">Lista miejsc</a>
 
     <!-- Modal Structure -->
-    <div id="modal1" class="modal bottom-sheet">
-        <div class="modal-content">
-            <h5>Lista miejsc</h5>
-            <ul class="collection" id="listOfPlaces">
-            </ul>
             
-        </div>
-        <!--<div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" style="position:absolute">Agree</a>
-        </div>-->
-        </div>
 
-    <div class="col s3">
+    <div class="col s3" style="box-shadow: 0px 0px 2px #888888;">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form">
             <br /> <!-- Prowizorka -->
             <div class="input-field col s12">
@@ -26,7 +16,7 @@
                 <input asp-for="City" id="city_poc" type="text" class="validate">
                 <label asp-for="City" for="city_poc"></label>
             </div>
-            <div class="col s12">
+            @*<div class="col s12">
                 <i class="tiny material-icons prefix">today</i>
                 <label asp-for="BeginTrip" for="start_date"></label>
                 <input asp-for="BeginTrip" type="date" id="start_date" class="datepicker">
@@ -34,40 +24,51 @@
                 <i class="tiny material-icons prefix">today</i>
                 <label asp-for="EndTrip" for="end_date"></label>
                 <input asp-for="EndTrip" type="date" id="end_date" class="datepicker">
+            </div>*@
+            <!--tabsy-->
+            <ul class="tabs">
+                <li class="tab col s1"><a href="#preferencje">Preferencje</a></li>
+                <li class="tab col s1"><a href="#placesCards">Lista miejsc</a></li>
+            </ul>
+            <!--tabsy-->
+            <div id="preferencje" class="col s12">
+                <ul class="collection with-header">
+                    <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
+                    <li class="collection-item">
+                            <input value="true" class="filled-in" asp-checkbox-for="Monuments" />
+                        <br />
+                        <input value="true" class="filled-in" asp-checkbox-for="Museum" />
+
+                    </li>    
+                </ul>
+                <ul class="collection with-header">
+                    <li class="collection-header" style="font-size: small; color: #0d47a1;">Rozrywka</li>
+                    <li class="collection-item">
+                        <input value="true" class="filled-in" asp-checkbox-for="Club" />
+                        <br />
+                        <input value="true" class="filled-in" asp-checkbox-for="Cinema" />
+                    </li>
+                </ul>
+                <ul class="collection with-header">
+                    <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
+                    <li class="collection-item">
+                        <input value="true" class="filled-in" asp-checkbox-for="Food" />
+                    </li>
+                </ul>
+                <div class="col s3">
+                    <p id="savingButton" style="visibility: hidden">
+                        <a class="waves-effect waves-light btn" onclick="app.saveTrip()">
+                            <i class="material-icons right">play_for_work</i>Zapisz
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div id="placesCards" class="col s12" style="height: 440px; overflow: auto;">
+
             </div>
 
-            <ul class="collection with-header">
-                <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
-                <li class="collection-item">
-                    <input value="true" class="filled-in" asp-checkbox-for="Monuments"/>
-                    <br />
-                    <input value="true" class="filled-in" asp-checkbox-for="Museum" />
+            
 
-                </li>    
-            </ul>
-            <ul class="collection with-header">
-                <li class="collection-header" style="font-size: small; color: #0d47a1;">Rozrywka</li>
-                <li class="collection-item">
-                    <input value="true" class="filled-in" asp-checkbox-for="Club" />
-                    <br />
-                    <input value="true" class="filled-in" asp-checkbox-for="Cinema" />
-                </li>
-            </ul>
-            <ul class="collection with-header">
-                <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
-                <li class="collection-item">
-                    <input value="true" class="filled-in" asp-checkbox-for="Food" />
-                </li>
-            </ul>
-
-
-            <div class="col s12">
-                <p id="savingButton" style="visibility: hidden">
-                    <a class="waves-effect waves-light btn" onclick="app.saveTrip()">
-                    
-                    <i class="material-icons right">play_for_work</i>Zapisz</a>
-                </p>
-            </div>
 
 
         </form>
@@ -115,13 +116,6 @@
             labelMonthSelect: 'Wybierz miesiąc',
             labelYearSelect: 'Wybierz rok',
         });
-
-
-
-       
-
-
-
 
     </script>
 }
