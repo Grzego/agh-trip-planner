@@ -11,6 +11,9 @@ function App() {
 
         trip = new Trip(self.tripGeneration);
 
+        console.log('self');
+        console.log(self);
+
         services.map.panTo(services.autocomplete.getPlace().geometry.location);
 
         var request = {
@@ -69,17 +72,14 @@ function App() {
     this.tripGeneration = function () {
         infowindow.close();
 
-        buttonFactory.showButton("savingButton");
-        console.log('tripGeneration');
+        showButton("savingButton");
 
-        markers.visible('startend', false);
-        markers.removeAll('startend');
+        markers.hideAndRemoveAll('startend');
 
-        trip.getStart().setVisible(true);
-        trip.getEnd().setVisible(true);
+        trip.setVisible(true);
 
         google.maps.event.addListener(services.map, "rightclick", function (event) {
-            markers.removeAll('optional');
+            markers.hideAndRemoveAll('optional');
 
             var haxmarker = new google.maps.Marker({
                 position: event.latLng,
@@ -94,8 +94,7 @@ function App() {
                 services.places.searchByType(['restaurant'], event.latLng, function (results, status) {
                     for (var i = 0; i < results.length; ++i) {
                         markers.append('optional', self.addToTripMark(results[i], function () {
-                            markers.visible('optional', false);
-                            markers.removeAll('optional');
+                            markers.hideAndRemoveAll('optional');
                             trip.setVisible(true);
                             infowindow.close();
                         }));
@@ -112,8 +111,7 @@ function App() {
                 services.places.searchByType(['atm'], event.latLng, function (results, status) {
                     for (var i = 0; i < results.length; ++i) {
                         markers.append('optional', self.addToTripMark(results[i], function () {
-                            markers.visible('optional', false);
-                            markers.removeAll('optional');
+                            markers.hideAndRemoveAll('optional');
                             trip.setVisible(true);
                             infowindow.close();
                         }));
@@ -215,7 +213,7 @@ function App() {
 
     this.addToTripMark = function (markIt, action) {
         console.log('addToTripMark');
-        return markerFactory.create(markIt, function (place, marker) {
+        return markerFactory.create(markIt, function (place, marker) {  
             services.places.details(place, function (details) {
                 var infodiv = document.createElement('div');
                 infodiv.innerHTML = GenerateContent(details);
@@ -246,33 +244,9 @@ function App() {
         });
     };
 
-    this.saveTrip = function() {
-        var start = convertMarker(trip.getStart());
-        var end = convertMarker(trip.getEnd());
-        var _waypoints = trip.getWaypoints();
-        var waips = []
-        for (i = 0; i < _waypoints.length; i++) {
-            waips[i] = convertMarker(_waypoints[i]);
-        }
-        $.ajax({
-            type: "POST",
-            url: "TripMap/TripMap/SavePath",
-            data:
-            {
-                'StartPlace': start,
-                'EndPlace': end,
-                'Waypoints': waips
-            },
-            success: function () {
-                console.log("Wysłano do bazy danych");
-            },
-            error: function (blad) {
-                console.log(blad);
-            }
-        });
+    this.saveTrip = function () {
+        trip.saveTrip();
     };
-
-
 
     var services = new Services(this.chooseStartEnd);
     var buttonFactory = new ButtonFactory();

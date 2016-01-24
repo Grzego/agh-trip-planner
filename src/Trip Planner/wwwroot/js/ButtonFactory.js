@@ -147,15 +147,13 @@ function ButtonFactory() {
             }
         }
     };
-
-    this.hideButton = function() {
-        document.getElementById(arguments[0]).style.visibility = "hidden";
-    };
-
-    this.showButton = function() {
-        document.getElementById(arguments[0]).style.visibility = "visible";
-    };
-
-
-
 }
+
+
+function hideButton (button) {
+    document.getElementById(button).style.visibility = "hidden";
+};
+
+function showButton (button) {
+    document.getElementById(button).style.visibility = "visible";
+};

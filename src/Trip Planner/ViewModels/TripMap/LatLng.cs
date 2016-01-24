@@ -7,8 +7,7 @@ namespace Trip_Planner.ViewModels.TripMap
 {
     public class LatLng
     {
-        public double lat;
-        public double lng;
-
+        public double Lat {	get; set; }
+        public double Lng { get; set; }
     }
 }

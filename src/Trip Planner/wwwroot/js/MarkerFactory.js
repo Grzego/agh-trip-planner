@@ -24,13 +24,13 @@ var MarkerFactory = function (_services) {
 
 };
 
-function convertMarker () {
-    var _lat = arguments[0].position.lat();
-    var _lng = arguments[0].position.lng();
+function convertMarker (marker) {
+    var _lat = marker.position.lat();
+    var _lng = marker.position.lng();
 
     return {
-        lat: _lat,
-        lng: _lng
+        Lat: _lat,
+        Lng: _lng
     };
 };
 
@@ -47,13 +47,9 @@ var MarkerCollections = function () {
         },
 
         visible: function (collection, onoff) {
-            console.log('visible');
-            console.log(markers);
             if (markers[collection]) {
-                console.log('collection length ' + markers[collection].length);
                 for (var i = 0; i < markers[collection].length; ++i) {
                     markers[collection][i].marker.setVisible(onoff);
-                    console.log(markers[collection][i] + ' turn to ' + onoff);
                 }
             }
         },
@@ -76,6 +72,15 @@ var MarkerCollections = function () {
 
         getCollection: function (collection) {
             return markers[collection];
+        },
+
+        hideAndRemoveAll: function (collection) {
+            if (markers[collection]) {
+                for (var i = 0; i < markers[collection].length; ++i) {
+                    markers[collection][i].marker.setVisible(false);
+                }
+            }
+            delete markers[collection];
         }
     };
 }

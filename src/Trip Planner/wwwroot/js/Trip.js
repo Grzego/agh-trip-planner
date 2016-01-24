@@ -1,16 +1,17 @@
 ﻿function Trip(generationState) {
+    var self = this;
     var startPoint = null;
     var endPoint = null;
     var waypoints = [];
 
     this.setStart = function (marker) {
         startPoint = marker;
-        this.checkTransition();
+        self.checkTransition();
     };
 
     this.setEnd = function (marker) {
         endPoint = marker;
-        this.checkTransition();
+        self.checkTransition();
     };
 
     this.getStart = function () {
@@ -47,5 +48,28 @@
         for (var i = 0; i < waypoints.length; ++i) {
             waypoints[i].setVisible(flag);
         }
-    }
+    };
+
+    this.saveTrip = function (continuation) {
+        var start = convertMarker(startPoint);
+        var end = convertMarker(endPoint);
+        var waips = waypoints.map(convertMarker);
+
+        $.ajax({
+            type: "POST",
+            url: "TripMap/SavePath",
+            data: {
+                StartPlace: start,
+                EndPlace: end,
+                Waypoints: waips
+            },
+            success: function () {
+                console.log("Data sended.");
+                continuation && continuation();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    };
 };
