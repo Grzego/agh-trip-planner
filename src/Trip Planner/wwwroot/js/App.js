@@ -96,9 +96,7 @@ function App() {
     this.tripGeneration = function () {
         infowindow.close();
 
-        buttonFactory.showButton("savingButton");
         console.log('tripGeneration');
-
         markers.visible('startend', false);
         markers.removeAll('startend');
 
@@ -185,18 +183,17 @@ function App() {
                                 for (var i = 0; i < results.length; i++) {
                                     markers.append(tid, self.addToTripMark(results[i]));
 
-                                    var MarkerData = self.addToTripMark(results[i]);
-
+                                    var markerData = self.addToTripMark(results[i]);
                                     //dodanie buttonow
                                     var cardButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
                                                                                     'Dodano do trasy',
                                                                                     'Usuń z trasy',
-                                                                                    trip.contains(MarkerData.marker) ? 'done' : 'add');
+                                                                                    trip.contains(markerData.marker) ? 'done' : 'add');
                                     cardButton.onClick(function () {
-                                        if (!trip.contains(MarkerData.marker)) {
-                                            trip.addPlace(MarkerData.marker);
+                                        if (!trip.contains(markerData.marker)) {
+                                            trip.addPlace(markerData.marker);
                                         } else {
-                                            trip.removePlace(MarkerData.marker);
+                                            trip.removePlace(markerData.marker);
                                         }
                                         trip.setVisible(true);
                                         self.generateTrip();
@@ -206,7 +203,7 @@ function App() {
 
                                     
                                     //tworzenie karty i dodanie do taba
-                                    var card = createCard(MarkerData, cardButton);
+                                    var card = createCard(markerData, cardButton);
                                     document.getElementById("placesCards").appendChild(card);
                                     //---
                                 }
@@ -287,34 +284,6 @@ function App() {
             });
         });
     };
-
-    this.saveTrip = function() {
-        var start = convertMarker(trip.getStart());
-        var end = convertMarker(trip.getEnd());
-        var _waypoints = trip.getWaypoints();
-        var waips = []
-        for (i = 0; i < _waypoints.length; i++) {
-            waips[i] = convertMarker(_waypoints[i]);
-        }
-        $.ajax({
-            type: "POST",
-            url: "TripMap/TripMap/SavePath",
-            data:
-            {
-                'StartPlace': start,
-                'EndPlace': end,
-                'Waypoints': waips
-            },
-            success: function () {
-                console.log("Wysłano do bazy danych");
-            },
-            error: function (blad) {
-                console.log(blad);
-            }
-        });
-    };
-
-
 
     var services = new Services(this.chooseStartEnd);
     var buttonFactory = new ButtonFactory();
