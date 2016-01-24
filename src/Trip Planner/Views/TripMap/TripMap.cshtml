@@ -1,5 +1,4 @@
 ﻿@model PreferencesViewModel
-@*@model TripDataViewModel*@
 
 <div class="row" id="row1">
 
@@ -9,11 +8,11 @@
             
 
     <div class="col s3" style="box-shadow: 0px 0px 2px #888888;">
-        <form asp-controller="TripMap" asp-action="#" method="post" role="form">
+        <form asp-controller="TripMap" asp-action="#" method="post" role="form" onsubmit="return false;">
             <br /> <!-- Prowizorka -->
             <div class="input-field col s12">
                 <i class="material-icons prefix">room</i>
-                <input asp-for="City" id="city_poc" type="text" class="validate">
+                <input asp-for="City" id="city_poc" type="text">
                 <label asp-for="City" for="city_poc"></label>
             </div>
             @*<div class="col s12">
@@ -55,7 +54,7 @@
                         <input value="true" class="filled-in" asp-checkbox-for="Food" />
                     </li>
                 </ul>
-                <div class="col s3">
+                <div class="col s12">
                     <p id="savingButton" style="visibility: hidden">
                         <a class="waves-effect waves-light btn" onclick="app.saveTrip()">
                             <i class="material-icons right">play_for_work</i>Zapisz
@@ -64,12 +63,7 @@
                 </div>
             </div>
             <div id="placesCards" class="col s12" style="height: 440px; overflow: auto;">
-
             </div>
-
-            
-
-
 
         </form>
         @*<div class="col s2">

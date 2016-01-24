@@ -1,40 +1,43 @@
-﻿/// <reference path="Trip.ts"/>
-/// <reference path="Services.ts"/>
-/// <reference path="MarkerFactory.ts"/>
-/// <reference path="ButtonFactory.ts"/>
-
+﻿
 // -----
-function createCard(MarkerData, cardButton) {
+function createCard(markerData, cardButton) {
     //var marker = MarkerData.marker;
-    var details = MarkerData.place;
+    var details = markerData.place;
 
     //tworzenie karty
     var card = document.createElement("div");
     card.className = "card small";
-    card.style.Height = "270px";
+    card.style.maxHeight = "260px";
+    //card.style.minHeight = "100px";
 
     if (details.photos) {
-        var photoURL = details.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
+        var photoURL = details.photos[0].getUrl({ 'maxWidth': 400, 'maxHeight': 400 });
         card.innerHTML = "<div class=\"card-image waves-effect waves-block waves-light\">" +
             "<img class=\"activator\" src=\"" + photoURL + "\"/>" +
         "</div>";
     }
-    card.innerHTML += "<div class=\"card-content\" style=\"max-height:60px\">" +
-                "<span class=\"card-title activator grey-text text-darken-4\"><i class=\"material-icons right\">more_vert</i><p style=\"font-size:13px; line-height: 14px\"><b>" + details.name + "</p></b></span>" +
-            "</div>" +
-            "<div class=\"card-reveal\">" +
-                "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i>" + details.name + "</span>" +
-                "<p>Here is some more information about this product that is only revealed once clicked on.</p>" +
+    card.innerHTML += "<div class=\"card-content\" style=\"max-height:70px\">" +
+                "<span class=\"card-title activator grey-text text-darken-4\"><i class=\"material-icons right\">more_vert</i><p style=\"font-size:15px; line-height: 17px\"><b>" + details.name + "</b></p></span>" +
+
             "</div>";
-    card.appendChild(cardButton.getContent());
+    var cardReveal = document.createElement("div");
+    cardReveal.className = "card-reveal";
+    cardReveal.innerHTML = "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i><p style=\"font-size:15px; line-height: 17px\"><b>" + details.name + "</b></p></span>" +
+                "<p>Here is some more information about this product that is only revealed once clicked on.</p>";
+    //"<div class=\"card-reveal\">" +
+    //    "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i>" + details.name + "</span>" +
+    //   "<p>Here is some more information about this product that is only revealed once clicked on.</p>"
+    //"</div>";
+    card.appendChild(cardReveal);
+    cardReveal.appendChild(cardButton.getContent());
     return card;
-}
+};
+//--------
 //--------
 
 function App() {
     this.chooseStartEnd = function () {
         console.log('chooseStartEnd');
-
         markers.visible('trip', false);
 
         trip = new Trip(self.tripGeneration);
@@ -57,9 +60,9 @@ function App() {
                             infodiv.innerHTML = GenerateContent(details);
 
                             var startButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt startowy',
-                                'Ustalony punkt startowy',
-                                'Usuń punkt startowy',
-                                trip.getStart() === marker ? 'done' : 'add');
+                                                                                'Ustalony punkt startowy',
+                                                                                'Usuń punkt startowy',
+                                                                                trip.getStart() === marker ? 'done' : 'add');
                             startButton.onClick(function () {
                                 trip.setStart(trip.getStart() != null ? null : marker);
                             });
@@ -178,9 +181,10 @@ function App() {
                         }, function (results, status) {
                             if (status === google.maps.places.PlacesServiceStatus.OK) {
                                 for (var i = 0; i < results.length; i++) {
-                                    markers.append(tid, self.addToTripMark(results[i]));
-
                                     var markerData = self.addToTripMark(results[i]);
+
+                                    markers.append(tid, markerData);
+
                                     //dodanie buttonow
                                     var cardButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
                                                                                     'Dodano do trasy',
@@ -191,10 +195,10 @@ function App() {
                                             trip.addPlace(markerData.marker);
                                         } else {
                                             trip.removePlace(markerData.marker);
-                                }
+                                        }
                                         trip.setVisible(true);
                                         self.generateTrip();
-                        });
+                                    });
                                     cardButton.mouseEnter();
                                     cardButton.mouseLeave();
 
@@ -204,13 +208,13 @@ function App() {
                                     document.getElementById("placesCards").appendChild(card);
                                     //---
                                 }
-                        }
+                            }
                         });
                     } else {
 
                     }
-                    markers.visible(tid, true);                   
-                  //przelaczenie tab
+                    markers.visible(tid, true);
+                    //przelaczenie tab
                     $('ul.tabs').tabs('select_tab', 'placesCards');
 
                 } else {
@@ -220,7 +224,6 @@ function App() {
                 }
             });
         });
-
     };
 
     this.generateTrip = function (/*travelMode*/) {
@@ -293,4 +296,4 @@ function App() {
     var markers = new MarkerCollections();
     var trip = null;
     var self = this;
-}
+};

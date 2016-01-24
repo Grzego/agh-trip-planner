@@ -91,7 +91,7 @@ function ButtonFactory() {
             getContent: function () {
                 return content;
             }
-        }
+        };
     };
 
     this.createAddButton = function (defaultText) {
@@ -145,9 +145,9 @@ function ButtonFactory() {
             getContent: function () {
                 return content;
             }
-        }
+        };
     };
-}
+};
 
 
 function hideButton (button) {

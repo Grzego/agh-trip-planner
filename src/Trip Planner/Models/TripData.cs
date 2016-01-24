@@ -10,8 +10,8 @@ namespace Trip_Planner.Models
     {
 		public int TripDataID { get; set; }
 		public virtual ApplicationUser User { get; set; }
-		public LatLng StartPlace { get; set; }
-        public LatLng EndPlace { get; set; }
-        public List<LatLng> Waypoints { get; set; }
+		//public LatLng StartPlace { get; set; }
+  //      public LatLng EndPlace { get; set; }
+  //      public List<LatLng> Waypoints { get; set; }
     }
 }

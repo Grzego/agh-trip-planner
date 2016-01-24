@@ -83,4 +83,4 @@ var MarkerCollections = function () {
             delete markers[collection];
         }
     };
-}
+};

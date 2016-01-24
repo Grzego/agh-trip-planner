@@ -40,6 +40,8 @@ namespace Trip_Planner.Controllers
 
 			await _applicationDbContext.SaveChangesAsync();
 
+			Console.WriteLine(tripDataViewModel);
+
             return Json(new { saved = true });
 		}
     }
