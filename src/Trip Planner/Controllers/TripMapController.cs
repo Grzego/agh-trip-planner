@@ -11,6 +11,7 @@ using Microsoft.Data.Entity;
 using Trip_Planner.Models;
 using Trip_Planner.Services;
 using Trip_Planner.ViewModels.TripMap;
+
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Trip_Planner.Controllers
@@ -18,29 +19,32 @@ namespace Trip_Planner.Controllers
     public class TripMapController : Controller
     {
 		private readonly ApplicationDbContext _applicationDbContext;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public TripMapController(ApplicationDbContext applicationDbContext)
+		public TripMapController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
 		{
 			_applicationDbContext = applicationDbContext;
+			_userManager = userManager;
 		}
 
 		// GET: /<controller>/
-		public IActionResult TripMap()
+		public IActionResult TripMap(int? id)
         {
             return View();
         }
 
 		[HttpPost]
-		public async Task<IActionResult> SavePath(TripDataViewModel tripDataViewModel)
+		public async Task<IActionResult> SavePath(TripData tripData)
 		{
-			TripData tripData = new TripData();
 			// TODO: somehow assign received values
 
-			//_applicationDbContext.Add(tripData);
+			//
+
+			tripData.User = await _userManager.FindByIdAsync(User.GetUserId());
+
+			_applicationDbContext.Add(tripData);
 
 			await _applicationDbContext.SaveChangesAsync();
-
-			Console.WriteLine(tripDataViewModel);
 
             return Json(new { saved = true });
 		}

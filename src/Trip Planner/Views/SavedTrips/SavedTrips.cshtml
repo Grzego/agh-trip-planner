@@ -1,8 +1,7 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@model IEnumerable<TripData>
 
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Wycieczki";
 }
 
@@ -16,42 +15,20 @@
         </div>
         
         <ul class="collection">
-            <li class="collection-item avatar">
-                <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
-                <span class="title">Wycieczka 1</span>
-                <p>
-                    Opis <br>
-                    ...
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons medium">send</i></a>
-            </li>
-            <li class="collection-item avatar">
-                <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
-                <span class="title">Wycieczka 2</span>
-                <p>
-                    Opis <br>
-                    ...
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons medium">send</i></a>
-            </li>
-            <li class="collection-item avatar">
-                <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
-                <span class="title">Wycieczka 3</span>
-                <p>
-                    Opis <br>
-                    ...
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons medium">send</i></a>
-            </li>
-            <li class="collection-item avatar">
-                <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
-                <span class="title">Wycieczka 4</span>
-                <p>
-                    Opis <br>
-                    ...
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons medium">send</i></a>
-            </li>
+            @foreach (var tripData in Model)
+            {
+                <li class="collection-item avatar">
+                    <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
+                    <span class="title">Wycieczka 1</span>
+                    <p>
+                        Opis <br>
+                        ...
+                    </p>
+                    @*<a asp-controller="TripMap" asp-action="TripMap" asp></a>*@
+                    @*<a href="TripMap/TripMap/" + @tripData.TripDataID class="secondary-content"><i class="material-icons medium">send</i></a>*@
+                    @Html.Raw("<a href=\"/TripMap/TripMap/?id=" + tripData.TripDataID + "\"><i class=\"material-icons medium\">send</i></a>");
+                </li>
+            }
         </ul>
 
     </div>

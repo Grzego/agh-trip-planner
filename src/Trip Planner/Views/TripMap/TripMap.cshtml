@@ -7,7 +7,7 @@
     <!-- Modal Structure -->
             
 
-    <div class="col s3" style="box-shadow: 0px 0px 2px #888888;">
+    <div class="col s3" style="box-shadow: 0px 0px 2px #888888; height:90vh;">
         <form asp-controller="TripMap" asp-action="#" method="post" role="form" onsubmit="return false;">
             <br /> <!-- Prowizorka -->
             <div class="input-field col s12">
@@ -34,35 +34,43 @@
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
                     <li class="collection-item">
-                            <input value="true" class="filled-in" asp-checkbox-for="Monuments" />
+                        <a onclick="app.preferences.notify('Monuments')"class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Monuments">
+                            <i class="material-icons">add</i></a><label style="font-size: medium;"> Zabytki</label>
                         <br />
-                        <input value="true" class="filled-in" asp-checkbox-for="Museum" />
-
+                        <a onclick="app.preferences.notify('Museum')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Museum">
+                            <i class="material-icons">add</i>
+                        </a><label style="font-size: medium;"> Muzea</label>
                     </li>    
                 </ul>
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Rozrywka</li>
                     <li class="collection-item">
-                        <input value="true" class="filled-in" asp-checkbox-for="Club" />
+                        <a onclick="app.preferences.notify('Club')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Club">
+                            <i class="material-icons">add</i>
+                        </a><label style="font-size: medium;"> Kluby</label>
                         <br />
-                        <input value="true" class="filled-in" asp-checkbox-for="Cinema" />
+                        <a onclick="app.preferences.notify('Cinema')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Cinema">
+                            <i class="material-icons">add</i>
+                        </a><label style="font-size: medium;"> Kino</label>
                     </li>
                 </ul>
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
                     <li class="collection-item">
-                        <input value="true" class="filled-in" asp-checkbox-for="Food" />
+                        <a onclick="app.preferences.notify('Food')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Food">
+                            <i class="material-icons">add</i>
+                        </a><label style="font-size: medium;"> Jedzenie</label>
                     </li>
                 </ul>
                 <div class="col s12">
                     <p id="savingButton" style="visibility: hidden">
-                        <a class="waves-effect waves-light btn" onclick="app.saveTrip()">
+                        <a class="waves-effect waves-light btn" onclick="app.trip.save()">
                             <i class="material-icons right">play_for_work</i>Zapisz
                         </a>
                     </p>
                 </div>
             </div>
-            <div id="placesCards" class="col s12" style="height: 440px; overflow: auto;">
+            <div id="placesCards" class="col s12" style="height: 90vh; overflow: auto;">
             </div>
 
         </form>
@@ -71,7 +79,7 @@
         </div>*@
     </div>
     <div class="col s9">
-        <div id="map" style="min-height: 500px; height: 90vh;"></div>
+        <div id="map" style="height: 90vh;"></div>
     </div>
 </div>  
 
@@ -80,6 +88,7 @@
     <script src="~/js/MarkerFactory.js"></script>
     <script src="~/js/ButtonFactory.js"></script>
     <script src="~/js/Trip.js"></script>
+    <script src="~/js/Preferences.js"></script>
     <script src="~/js/Services.js"></script>
     <script src="~/js/App.js"></script>
     <script>
@@ -91,6 +100,7 @@
         Main loading
         */
         google.maps.event.addDomListener(window, 'load', function () {
+            // jesli jest jakis get to pobierz z serwera sciezke i wyswietl
             app = new App();
         });
 

@@ -16,10 +16,11 @@ function createCard(markerData, cardButton) {
             "<img class=\"activator\" src=\"" + photoURL + "\"/>" +
         "</div>";
     }
-    card.innerHTML += "<div class=\"card-content\" style=\"max-height:70px\">" +
-                "<span class=\"card-title activator grey-text text-darken-4\"><i class=\"material-icons right\">more_vert</i><p style=\"font-size:15px; line-height: 17px\"><b>" + details.name + "</b></p></span>" +
 
-            "</div>";
+    card.innerHTML += "<div class=\"card-content\" style=\"max-height:70px\">" +
+                "<span class=\"card-title activator grey-text text-darken-4\"><i class=\"material-icons right\">more_vert</i><p style=\"font-size:15px; line-height: 17px\"><b>" +
+                details.name + "</b></p></span></div>";
+
     var cardReveal = document.createElement("div");
     cardReveal.className = "card-reveal";
     cardReveal.innerHTML = "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i><p style=\"font-size:15px; line-height: 17px\"><b>" + details.name + "</b></p></span>" +
@@ -37,10 +38,10 @@ function createCard(markerData, cardButton) {
 
 function App() {
     this.chooseStartEnd = function () {
-        console.log('chooseStartEnd');
+        Materialize.toast("Wybierz gdzie chcesz rozpocząć i zakończyć wycieczkę", 10000);
         markers.visible('trip', false);
 
-        trip = new Trip(self.tripGeneration);
+        self.trip = new Trip(self.tripGeneration);
         services.map.panTo(services.autocomplete.getPlace().geometry.location);
 
         var request = {
@@ -54,7 +55,7 @@ function App() {
         services.places.nearbySearch(request, function (results, status) {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; ++i) {
-                    markers.append('startend', markerFactory.create(results[i], function (place, marker) {
+                    markers.append('startend', MarkerFlyweightFactory.create(services.map, results[i], function (place, marker) {
                         services.places.details(place, function (details) {
                             var infodiv = document.createElement('div');
                             infodiv.innerHTML = GenerateContent(details);
@@ -62,23 +63,19 @@ function App() {
                             var startButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt startowy',
                                                                                 'Ustalony punkt startowy',
                                                                                 'Usuń punkt startowy',
-                                                                                trip.getStart() === marker ? 'done' : 'add');
+                                                                                self.trip.getStart() === marker ? 'done' : 'add');
                             startButton.onClick(function () {
-                                trip.setStart(trip.getStart() != null ? null : marker);
+                                self.trip.setStart(self.trip.getStart() != null ? null : marker);
                             });
-                            startButton.mouseEnter();
-                            startButton.mouseLeave();
 
                             var endButton = buttonFactory.createAddRemoveButton('Ustaw jako punkt końcowy',
                                 'Ustalony punkt końcowy',
                                 'Usuń punkt końcowy',
-                                trip.getEnd() === marker ? 'done' : 'add');
+                                self.trip.getEnd() === marker ? 'done' : 'add');
 
                             endButton.onClick(function () {
-                                trip.setEnd(trip.getEnd() != null ? null : marker);
+                                self.trip.setEnd(self.trip.getEnd() != null ? null : marker);
                             });
-                            endButton.mouseEnter();
-                            endButton.mouseLeave();
 
                             infodiv.appendChild(startButton.getContent());
                             infodiv.appendChild(endButton.getContent());
@@ -98,12 +95,12 @@ function App() {
 
     this.tripGeneration = function () {
         infowindow.close();
-
         showButton("savingButton");
-
         markers.hideAndRemoveAll('startend');
 
-        trip.setVisible(true);
+        self.trip.generate(services);
+
+        self.trip.setVisible(true);
 
         google.maps.event.addListener(services.map, "rightclick", function (event) {
             markers.hideAndRemoveAll('optional');
@@ -118,14 +115,12 @@ function App() {
             var restaurantButton = buttonFactory.createAddButton('Odwiedź restauracje');
 
             restaurantButton.onClick(function () {
-                services.places.searchByType(['restaurant'], event.latLng, function (results, status) {
-                    for (var i = 0; i < results.length; ++i) {
-                        markers.append('optional', self.addToTripMark(results[i], function () {
-                            markers.hideAndRemoveAll('optional');
-                            trip.setVisible(true);
-                            infowindow.close();
-                        }));
-                    }
+                services.places.searchByType(['restaurant'], event.latLng, function (place) {
+                    markers.append('optional', self.addToTripMark(place, function () {
+                        markers.hideAndRemoveAll('optional');
+                        self.trip.setVisible(true);
+                        infowindow.close();
+                    }));
                 });
                 infowindow.close();
             });
@@ -135,14 +130,12 @@ function App() {
             var atmButton = buttonFactory.createAddButton('Znajdź bankomat');
 
             atmButton.onClick(function () {
-                services.places.searchByType(['atm'], event.latLng, function (results, status) {
-                    for (var i = 0; i < results.length; ++i) {
-                        markers.append('optional', self.addToTripMark(results[i], function () {
-                            markers.hideAndRemoveAll('optional');
-                            trip.setVisible(true);
-                            infowindow.close();
-                        }));
-                    }
+                services.places.searchByType(['atm'], event.latLng, function (place) {
+                    markers.append('optional', self.addToTripMark(place, function () {
+                        markers.hideAndRemoveAll('optional');
+                        self.trip.setVisible(true);
+                        infowindow.close();
+                    }));
                 });
                 infowindow.close();
             });
@@ -189,19 +182,16 @@ function App() {
                                     var cardButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
                                                                                     'Dodano do trasy',
                                                                                     'Usuń z trasy',
-                                                                                    trip.contains(markerData.marker) ? 'done' : 'add');
+                                                                                    self.trip.contains(markerData.marker) ? 'done' : 'add');
                                     cardButton.onClick(function () {
-                                        if (!trip.contains(markerData.marker)) {
-                                            trip.addPlace(markerData.marker);
+                                        if (!self.trip.contains(markerData.marker)) {
+                                            self.trip.addPlace(markerData.marker);
                                         } else {
-                                            trip.removePlace(markerData.marker);
+                                            self.trip.removePlace(markerData.marker);
                                         }
-                                        trip.setVisible(true);
-                                        self.generateTrip();
+                                        self.trip.setVisible(true);
+                                        self.trip.generate(services);
                                     });
-                                    cardButton.mouseEnter();
-                                    cardButton.mouseLeave();
-
 
                                     //tworzenie karty i dodanie do taba
                                     var card = createCard(markerData, cardButton);
@@ -220,41 +210,16 @@ function App() {
                 } else {
                     markers.visible(tid, false);
                     // NA PALE xD DO POPRAWY
-                    trip.setVisible(true);
+                    self.trip.setVisible(true);
                 }
             });
-        });
-    };
-
-    this.generateTrip = function (/*travelMode*/) {
-        console.log('generateTrip');
-
-        var waypoints = trip.getWaypoints().map(function (item) {
-            return {
-                location: item.position,
-                stopover: true
-            };
-        });
-
-        services.directions.route({
-            origin: trip.getStart().position,
-            destination: trip.getEnd().position,
-            waypoints: waypoints,
-            optimizeWaypoints: true,
-            travelMode: google.maps.TravelMode.WALKING
-        }, function (response, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-                services.directionsDisplay.setMap(services.map);
-                services.directionsDisplay.setDirections(response);
-            }
         });
     };
 
     // -----
 
     this.addToTripMark = function (markIt, action) {
-        console.log('addToTripMark');
-        return markerFactory.create(markIt, function (place, marker) {
+        return MarkerFlyweightFactory.create(services.map, markIt, function (place, marker) {
             services.places.details(place, function (details) {
                 var infodiv = document.createElement('div');
                 infodiv.innerHTML = GenerateContent(details);
@@ -262,20 +227,18 @@ function App() {
                 var placeButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
                     'Dodano do trasy',
                     'Usuń z trasy',
-                    trip.contains(marker) ? 'done' : 'add');
+                    self.trip.contains(marker) ? 'done' : 'add');
+
                 placeButton.onClick(function () {
-                    if (!trip.contains(marker)) {
-                        trip.addPlace(marker);
+                    if (!self.trip.contains(marker)) {
+                        self.trip.addPlace(marker);
                     } else {
-                        trip.removePlace(marker);
+                        self.trip.removePlace(marker);
                     }
                     infowindow.close();
-                    self.generateTrip();
+                    self.trip.generate(services);
                     action && action();
                 });
-
-                placeButton.mouseEnter();
-                placeButton.mouseLeave();
 
                 infodiv.appendChild(placeButton.getContent());
 
@@ -285,15 +248,16 @@ function App() {
         });
     };
 
-    this.saveTrip = function () {
-        trip.saveTrip();
-    };
+    // -----
+
+    this.preferences = new Preferences();
+    this.trip = null;
+
+    // -----
 
     var services = new Services(this.chooseStartEnd);
     var buttonFactory = new ButtonFactory();
-    var markerFactory = new MarkerFactory(services);
     var infowindow = new google.maps.InfoWindow({ maxWidth: 240 });
     var markers = new MarkerCollections();
-    var trip = null;
     var self = this;
 };

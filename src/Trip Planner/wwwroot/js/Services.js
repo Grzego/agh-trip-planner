@@ -1,32 +1,17 @@
-﻿var Services = function (initState) { // TODO: pokombinowac jeszcze
-    console.log('Create map');
-    var _map = new MapProxy();
+﻿function Services (initState) { // TODO: pokombinowac jeszcze
+    var self = this;
 
-    console.log('is undef map? ' + _map);
+    // -----
 
-    console.log('Create places');
-    var _places = new PlaceServiceProxy(_map);
-
-    console.log('Create autocomplete');
-    var _autocomplete = new AutocompleteCitiesProxy(initState);
-
-    console.log('Create directions');
-    var _directions = new google.maps.DirectionsService();
-
-    console.log('Create directions display');
-    var _directionsDisplay = new google.maps.DirectionsRenderer({
-        map: _map.map,
+    this.map = new MapProxy();
+    this.places = new PlaceServiceProxy(self.map);
+    this.autocomplete = new AutocompleteCitiesProxy(initState);
+    this.directions = new google.maps.DirectionsService();
+    this.directionsDisplay = new google.maps.DirectionsRenderer({
+        map: self.map,
         preserveViewport: true,
         suppressMarkers: true,
     });
-
-    return {
-        map: _map,
-        places: _places,
-        autocomplete: _autocomplete,
-        directions: _directions,
-        directionsDisplay: _directionsDisplay
-    };
 };
 
 // -----
@@ -37,7 +22,7 @@ function MapProxy() {
     var mapOptions = {
         center: new google.maps.LatLng(50.0468548, 19.9348337),
         zoom: 12,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP // IMPORTANT! Dodac opcje zmiany sposobu poruszania sie
     };
 
     return new google.maps.Map(mapCanvas, mapOptions);
@@ -50,37 +35,50 @@ function PlaceServiceProxy(map) {
     var placeService = new google.maps.places.PlacesService(map);
     var _details = {};
 
-    return {
-        nearbySearch: function (request, callback) {
-            placeService.nearbySearch(request, callback);
-        },
+    // -----
 
-        searchByType: function (types, latLng, callback) {
-            var request = {
-                location: latLng,
-                radius: 1000,
-                types: types
-            };
+    // ---
+    this.nearbySearch = function (request, callback) {
+        placeService.nearbySearch(request, callback);
+        //placeService.nearbySearch(request, function (results, status) {
+        //    //if (status === )
+        //    //for (var i = 0; i < results)
+        //});
+    };
 
-            placeService.nearbySearch(request, callback);
-        },
+    // ---
+    this.searchByType = function (types, latLng, callback) {
+        var request = {
+            location: latLng,
+            radius: 1000,
+            types: types
+        };
 
-        details: function (place, continuation) {
-            if (_details[place.place_id]) {
-                continuation(_details[place.place_id]);
-            } else {
-                var request = { placeId: place.place_id };
-                placeService.getDetails(request, function (results, status) {
-                    if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                        // show error xD or something
-                        return;
-                    }
-
-                    // -----
-                    _details[place.place_id] = results;
-                    continuation(results);
-                });
+        placeService.nearbySearch(request, function (results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; ++i) {
+                    callback(results[i]);
+                }
             }
+        });
+    };
+
+    // ---
+    this.details = function (place, continuation) {
+        if (_details[place.place_id]) {
+            continuation(_details[place.place_id]);
+        } else {
+            var request = { placeId: place.place_id };
+            placeService.getDetails(request, function (results, status) {
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                    // show error xD or something
+                    return;
+                }
+
+                // -----
+                _details[place.place_id] = results;
+                continuation(results);
+            });
         }
     };
 };

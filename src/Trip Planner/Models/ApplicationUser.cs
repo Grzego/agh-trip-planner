@@ -15,5 +15,10 @@ namespace Trip_Planner.Models
 		{
 			TripDatas = new List<TripData>();
 		}
-    }
+
+		public override bool Equals(object obj)
+		{
+			return Id == ((ApplicationUser)obj).Id;
+		}
+	}
 }

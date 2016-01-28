@@ -1,27 +1,42 @@
-﻿function MarkerData(marker, listener, place) {
+﻿function MarkerFlyweight(marker, listener, place) {
     this.marker = marker;
     this.listener = listener;
     this.place = place;
+
+
 };
 
-var MarkerFactory = function (_services) {
-    var services = _services;
+var MarkerFlyweightFactory = new function () {
+    var self = this;
+    var markers = {};
 
-    return {
-        create: function (place, callback) {
+    // -----
+
+    this.create = function (map, place, callback) {
+        if (markers[place.place_id]) {
+            var marker = markers[place.place_id];
+            // ----
+            google.maps.event.removeListener(marker.listener);
+            marker.listener = google.maps.event.addListener(marker.marker, 'click', function () {
+                callback(place, marker.marker);
+            });
+
+            return marker;
+        } else {
             var marker = new google.maps.Marker({
-                map: services.map,
+                map: map,
                 position: place.geometry.location
                 // icon: <-- can be set with... marker.marker.setIcon('...');
             });
             var listener = google.maps.event.addListener(marker, 'click', function () {
                 callback(place, marker);
             });
-            return new MarkerData(marker, listener, place);
+            markerData = new MarkerFlyweight(marker, listener, place);
+            markers[place.place_id] = markerData;
+
+            return markerData;
         }
     };
-
-
 };
 
 function convertMarker (marker) {

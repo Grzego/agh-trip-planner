@@ -48,9 +48,15 @@ function ButtonFactory() {
             icon.innerHTML = states[currentState].iconHTML;
             button.className = states[currentState].buttonClass;
             label.innerHTML = ' ' + states[currentState].labelHTML;
-        }
+        };
 
         changeState();
+
+        // -----
+
+        $(button).click(function () { });
+        $(button).mouseenter(function () { });
+        $(button).mouseleave(function () { });
 
         // -----
 
@@ -117,6 +123,12 @@ function ButtonFactory() {
 
         content.appendChild(button);
         content.appendChild(label);
+
+        // -----
+
+        $(button).click(function () { });
+        $(button).mouseenter(function () { });
+        $(button).mouseleave(function () { });
 
         // -----
 
