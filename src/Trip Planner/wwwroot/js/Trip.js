@@ -1,8 +1,15 @@
 ﻿function Trip(nextState) {
     var self = this;
+    var city = null;
     var startPoint = null;
     var endPoint = null;
     var waypoints = [];
+
+    // -----
+
+    this.setCity = function (cityName) {
+        city = cityName;
+    };
 
     // -----
 
@@ -34,6 +41,7 @@
 
     this.checkIfDone = function () {
         if (startPoint != null && endPoint != null) {
+            // change listeners in markers
             nextState();
         }
     };
@@ -61,14 +69,14 @@
     this.generate = function (services) {
         var _waypoints = waypoints.map(function (item) {
             return {
-                location: item.position,
+                location: item.marker.position,
                 stopover: true
             };
         });
 
         services.directions.route({
-            origin: startPoint.position,
-            destination: endPoint.position,
+            origin: startPoint.marker.position,
+            destination: endPoint.marker.position,
             waypoints: _waypoints,
             optimizeWaypoints: true,
             travelMode: google.maps.TravelMode.WALKING // TODO: add more options
@@ -83,10 +91,10 @@
     // -----
 
     this.setVisible = function (flag) {
-        startPoint.setVisible(flag);
-        endPoint.setVisible(flag);
+        startPoint.marker.setVisible(flag);
+        endPoint.marker.setVisible(flag);
         for (var i = 0; i < waypoints.length; ++i) {
-            waypoints[i].setVisible(flag);
+            waypoints[i].marker.setVisible(flag);
         }
     };
 
@@ -97,10 +105,18 @@
         var end = convertMarker(endPoint);
         var waips = waypoints.map(convertMarker);
 
+        console.log({
+            City: city,
+            StartPlace: start,
+            EndPlace: end,
+            Waypoints: waips
+        });
+
         $.ajax({
             type: "POST",
             url: "TripMap/SavePath",
             data: {
+                City: city,
                 StartPlace: start,
                 EndPlace: end,
                 Waypoints: waips
@@ -113,5 +129,12 @@
                 console.log(error);
             }
         });
+    };
+
+    // -----
+
+    this.load = function () {
+        // -----
+
     };
 };

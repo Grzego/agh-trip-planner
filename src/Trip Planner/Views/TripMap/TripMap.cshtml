@@ -87,6 +87,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.22&libraries=places,maps"></script>
     <script src="~/js/MarkerFactory.js"></script>
     <script src="~/js/ButtonFactory.js"></script>
+    <script src="~/js/CardFactory.js"></script>
     <script src="~/js/Trip.js"></script>
     <script src="~/js/Preferences.js"></script>
     <script src="~/js/Services.js"></script>
@@ -96,11 +97,26 @@
 
         // -----
 
+        function getUrlParameter(param) {
+            var pageURL = decodeURIComponent(window.location.search.substring(1)),
+                URLVariables = pageURL.split('&'),
+                parameterName, i;
+
+            for (i = 0; i < URLVariables.length; i++) {
+                parameterName = URLVariables[i].split('=');
+                if (parameterName[0] === param) {
+                    return parameterName[1] === undefined ? true : parameterName[1];
+                }
+            }
+        };
+
+
         /*
         Main loading
         */
         google.maps.event.addDomListener(window, 'load', function () {
             // jesli jest jakis get to pobierz z serwera sciezke i wyswietl
+            var id = getUrlParameter('id');
             app = new App();
         });
 

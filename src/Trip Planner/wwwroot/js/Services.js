@@ -39,11 +39,13 @@ function PlaceServiceProxy(map) {
 
     // ---
     this.nearbySearch = function (request, callback) {
-        placeService.nearbySearch(request, callback);
-        //placeService.nearbySearch(request, function (results, status) {
-        //    //if (status === )
-        //    //for (var i = 0; i < results)
-        //});
+        placeService.nearbySearch(request, function (results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; i++) {
+                    callback(results[i]);
+                }
+            }
+        });
     };
 
     // ---
@@ -55,6 +57,7 @@ function PlaceServiceProxy(map) {
         };
 
         placeService.nearbySearch(request, function (results, status) {
+            console.log(status);
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; ++i) {
                     callback(results[i]);
@@ -86,7 +89,7 @@ function PlaceServiceProxy(map) {
 // -----
 // -----
 
-function GenerateContent(details) {
+function generateContent(details) {
     var content = "";
     content = "<strong>" + details.name + "</strong>" + "<br />" +
         (details.formatted_address ? details.formatted_address + "<br />" : "") +
@@ -97,6 +100,16 @@ function GenerateContent(details) {
         console.log(photoURL);
         content += "<img width=\"240\" src=\"" + photoURL + "\"/><br />";
     }
+    content += (details.rating ? "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
+    return content;
+};
+
+function generateContentImageless(details) {
+    var content = "";
+    content = "<strong>" + details.name + "</strong>" + "<br />" +
+        (details.formatted_address ? details.formatted_address + "<br />" : "") +
+        (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
+        (details.website ? "<a href=" + details.website + ">" + details.website + "</a><br />" : "");
     content += (details.rating ? "Ocena: <span style=color:#01579b;>" + details.rating + "</span><br /><br />" : "");
     return content;
 };

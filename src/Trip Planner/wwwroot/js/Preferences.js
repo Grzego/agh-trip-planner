@@ -1,50 +1,70 @@
-﻿function Preferences() {
+﻿function Preferences(app) {
     this.notify = function (kind) {
-        // hide all other marks off
-        // show markers in this kind
-        // remove all cards from tab
-        // add all cards in this kind
+        // hide all markers
+        for (var m in markers) {
+            markers[m].visible(false);
+        }
+        // remove all cards
+        var node = document.getElementById("placesCards");
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+        
 
-        if (!markers.contains(kind)) {
-            services.places.nearbySearch({
-                location: services.autocomplete.getPlace().geometry.location,
+        if (!markers[kind]) {
+            markers[kind] = new MarkerCollection();
+            cards[kind] = [];
+
+            app.services.places.nearbySearch({
+                location: app.services.autocomplete.getPlace().geometry.location,
                 radius: 20000,
                 types: placeMap[kind]
-            }, function (results, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    for (var i = 0; i < results.length; i++) {
-                        var markerData = self.addToTripMark(results[i]);
-                        markers[kind].push(markerData);
+            }, function (result) {
+                var markerData = app.addToTripMark(result);
+                markers[kind].append(markerData);
 
-                        //dodanie buttonow
-                        var cardButton = buttonFactory.createAddRemoveButton('Dodaj do trasy',
-                                                                        'Dodano do trasy',
-                                                                        'Usuń z trasy',
-                                                                        self.trip.contains(markerData.marker) ? 'done' : 'add');
-                        cardButton.onClick(function () {
-                            if (!self.trip.contains(markerData.marker)) {
-                                self.trip.addPlace(markerData.marker);
-                            } else {
-                                self.trip.removePlace(markerData.marker);
-                            }
-                            self.trip.setVisible(true);
-                            self.trip.generate(services);
-                        });
-                        cardButton.mouseEnter();
-                        cardButton.mouseLeave();
-
-
-                        //tworzenie karty i dodanie do taba
-                        var card = createCard(markerData, cardButton);
-                        document.getElementById("placesCards").appendChild(card);
-                        //---
+                //dodanie buttonow
+                var cardButton = ButtonFactory.createAddRemoveButton('Dodaj do trasy',
+                                                                'Dodano do trasy',
+                                                                'Usuń z trasy',
+                                                                app.trip.contains(markerData) ? 'done' : 'add');
+                cardButton.onClick(function () {
+                    if (!app.trip.contains(markerData)) {
+                        app.trip.addPlace(markerData);
+                    } else {
+                        app.trip.removePlace(markerData);
                     }
-                }
+                    app.trip.setVisible(true);
+                    app.trip.generate(app.services);
+                });
+                cardButton.mouseEnter();
+                cardButton.mouseLeave();
+
+
+                //tworzenie karty i dodanie do taba
+                var card = CardFactory.createCard(markerData);
+                card.onClick = function () {
+                    app.services.places.details(result, function (details) {
+                        card.setContent(generateContentImageless(details));
+                        card.appendButton(cardButton);
+                    });
+                };
+
+                cards[kind].push(card);
+                //---
+
+                node.appendChild(card.getContent());
             });
         } else {
-
+            // show this kind of markers
+            markers[kind].visible(true);
+            // append all cards
+            for (var i = 0; i < cards[kind].length; ++i) {
+                node.appendChild(cards[kind][i].getContent());
+            }
         }
-        markers.visible(tid, true);
+        
+
         //przelaczenie taba
         $('ul.tabs').tabs('select_tab', 'placesCards');
     };
@@ -52,6 +72,7 @@
     // -----
 
     var markers = {};
+    var cards = {};
 
     var placeMap = {
         'Monuments': ['city_hall', 'point_of_interest'],

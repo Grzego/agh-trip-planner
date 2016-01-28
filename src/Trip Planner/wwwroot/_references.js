@@ -2,6 +2,7 @@
 /// <reference path="../gulpfile.js" />
 /// <reference path="js/app.js" />
 /// <reference path="js/buttonfactory.js" />
+/// <reference path="js/cardfactory.js" />
 /// <reference path="js/init.js" />
 /// <reference path="js/markerfactory.js" />
 /// <reference path="js/preferences.js" />

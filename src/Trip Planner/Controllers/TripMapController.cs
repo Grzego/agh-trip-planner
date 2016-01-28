@@ -36,10 +36,6 @@ namespace Trip_Planner.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SavePath(TripData tripData)
 		{
-			// TODO: somehow assign received values
-
-			//
-
 			tripData.User = await _userManager.FindByIdAsync(User.GetUserId());
 
 			_applicationDbContext.Add(tripData);

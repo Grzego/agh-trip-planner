@@ -1,6 +1,6 @@
 ﻿
 
-function ButtonFactory() {
+var ButtonFactory = new function () {
     this.createAddRemoveButton = function (defaultText, addText, removeText, state) {
         var content = document.createElement('div');
 
@@ -51,12 +51,6 @@ function ButtonFactory() {
         };
 
         changeState();
-
-        // -----
-
-        $(button).click(function () { });
-        $(button).mouseenter(function () { });
-        $(button).mouseleave(function () { });
 
         // -----
 
