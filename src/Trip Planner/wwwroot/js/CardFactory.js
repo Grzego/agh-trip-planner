@@ -36,8 +36,8 @@
 
     this.setContent = function (content) {
         cardReveal.innerHTML = "<span class=\"card-title grey-text text-darken-4\"><i class=\"material-icons right\">close</i>" +
-                        "<p style=\"font-size:15px; line-height: 17px\"><b>" + markerData.place.name + "</b></p></span>" +
-                        "<p>" + content + "</p>";
+                        "<p style=\"font-size:15px; line-height: 17px\"><b></b></p></span>" +
+                        "<p style=\"font-size:15px; line-height: 17px\">" + content + "</p>";
     };
 
     // -----
