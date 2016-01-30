@@ -14,4 +14,3 @@
 /// <reference path="lib/jquery/dist/jquery.js" />
 /// <reference path="lib/jquery-placeholder/jquery.placeholder.js" />
 /// <reference path="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js" />
-/// <reference path="lib/materialize/bin/materialize.js" />
