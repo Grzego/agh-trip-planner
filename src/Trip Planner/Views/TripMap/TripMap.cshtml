@@ -35,17 +35,17 @@
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
                     <li class="collection-item">
-                        <div class="chip" style="margin-bottom: 10px;">
+                        <div onclick="app.preferences.notify('Monuments')" class="chip" style="margin-bottom: 10px; cursor:pointer;">
                             <img src="~/icons/ic_location_city_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
-                            <a onclick="app.preferences.notify('Monuments')" id="Monuments">
+                            <a id="Monuments">
                                 Zabytki
                             </a>
                         </div>
                         <br />
                         
-                        <div class="chip">
+                        <div onclick="app.preferences.notify('Museum')" class="chip" style="cursor:pointer;">
                             <img src="~/icons/ic_account_balance_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
-                            <a onclick="app.preferences.notify('Museum')" id="Museum">
+                            <a id="Museum">
                                 Muzea
                             </a>
                         </div>
@@ -66,17 +66,17 @@
                             <i class="material-icons">add</i>
                         </a><label style="font-size: medium;"> Kluby</label>*@
 
-                        <div class="chip"  style="margin-bottom: 10px;">
+                        <div class="chip" onclick="app.preferences.notify('Club')" style="margin-bottom: 10px; cursor:pointer;">
                             <img src="~/icons/ic_audiotrack_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
-                            <a onclick="app.preferences.notify('Club')" id="Club">
+                            <a  id="Club">
                                 Kluby
                             </a>
                         </div>
                         <br />
 
-                        <div class="chip" style="margin-bottom: 10px;">
+                        <div onclick="app.preferences.notify('Cinema')" class="chip" style="margin-bottom: 10px; cursor:pointer;">
                             <img src="~/icons/ic_movie_filter_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
-                            <a onclick="app.preferences.notify('Cinema')" id="Cinema">
+                            <a id="Cinema">
                                 Kino
                             </a>
                         </div>
@@ -97,9 +97,9 @@
                             <i class="material-icons">add</i>
                         </a><label style="font-size: medium;"> Restauracje</label>*@
 
-                        <div class="chip" style="margin-bottom: 10px;">
+                        <div onclick="app.preferences.notify('Food')" class="chip" style="margin-bottom: 10px; cursor:pointer;">
                             <img src="~/icons/ic_local_dining_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
-                            <a onclick="app.preferences.notify('Food')" id="Food">
+                            <a id="Food">
                                 Restauracje
                             </a>
                         </div>
