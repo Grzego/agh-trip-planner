@@ -26,45 +26,89 @@
             </div>*@
             <!--tabsy-->
             <ul class="tabs">
-                <li class="tab col s1"><a href="#preferencje">Preferencje</a></li>
-                <li class="tab col s1"><a href="#placesCards">Lista miejsc</a></li>
+                <li class="tab col s1"><a style="color: #d50000;" href="#preferencje">Preferencje</a></li>
+                <li class="tab col s1"><a style="color: #d50000;" href="#placesCards">Lista miejsc</a></li>
+                <div class="indicator  red accent-4" style="z-index:1"></div>
             </ul>
             <!--tabsy-->
             <div id="preferencje" class="col s12">
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Zwiedzanie</li>
                     <li class="collection-item">
-                        <a onclick="app.preferences.notify('Monuments')"class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Monuments">
+                        <div class="chip" style="margin-bottom: 10px;">
+                            <img src="~/icons/ic_location_city_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
+                            <a onclick="app.preferences.notify('Monuments')" id="Monuments">
+                                Zabytki
+                            </a>
+                        </div>
+                        <br />
+                        
+                        <div class="chip">
+                            <img src="~/icons/ic_account_balance_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
+                            <a onclick="app.preferences.notify('Museum')" id="Museum">
+                                Muzea
+                            </a>
+                        </div>
+                        <br />
+
+                        @*<a onclick="app.preferences.notify('Monuments')"class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Monuments">
                             <i class="material-icons">add</i></a><label style="font-size: medium;"> Zabytki</label>
                         <br />
                         <a onclick="app.preferences.notify('Museum')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Museum">
                             <i class="material-icons">add</i>
-                        </a><label style="font-size: medium;"> Muzea</label>
+                        </a><label style="font-size: medium;"> Muzea</label>*@
                     </li>    
                 </ul>
                 <ul class="collection with-header">
                     <li class="collection-header" style="font-size: small; color: #0d47a1;">Rozrywka</li>
                     <li class="collection-item">
-                        <a onclick="app.preferences.notify('Club')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Club">
+                        @*<a onclick="app.preferences.notify('Club')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Club">
                             <i class="material-icons">add</i>
-                        </a><label style="font-size: medium;"> Kluby</label>
+                        </a><label style="font-size: medium;"> Kluby</label>*@
+
+                        <div class="chip"  style="margin-bottom: 10px;">
+                            <img src="~/icons/ic_audiotrack_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
+                            <a onclick="app.preferences.notify('Club')" id="Club">
+                                Kluby
+                            </a>
+                        </div>
                         <br />
-                        <a onclick="app.preferences.notify('Cinema')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Cinema">
+
+                        <div class="chip" style="margin-bottom: 10px;">
+                            <img src="~/icons/ic_movie_filter_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
+                            <a onclick="app.preferences.notify('Cinema')" id="Cinema">
+                                Kino
+                            </a>
+                        </div>
+
+                        @*<a onclick="app.preferences.notify('Cinema')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Cinema">
                             <i class="material-icons">add</i>
-                        </a><label style="font-size: medium;"> Kino</label>
+                        </a><label style="font-size: medium;"> Kino</label>*@
                     </li>
                 </ul>
-                <ul class="collection with-header">
-                    <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
+
+                
+
+                <ul class="collection with-header">                   
+                  <li class="collection-header" style="font-size: small; color: #0d47a1;">Inne</li>
                     <li class="collection-item">
-                        <a onclick="app.preferences.notify('Food')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Food">
+
+                        @*<a onclick="app.preferences.notify('Food')" class="btn-floating btn-small waves-effect waves-light blue darken-1 z-depth-0" id="Food">
                             <i class="material-icons">add</i>
-                        </a><label style="font-size: medium;"> Jedzenie</label>
+                        </a><label style="font-size: medium;"> Restauracje</label>*@
+
+                        <div class="chip" style="margin-bottom: 10px;">
+                            <img src="~/icons/ic_local_dining_black_24dp_1x.png" alt="" style="height:20px; width:20px; margin-left:0px; margin-top:5px;">
+                            <a onclick="app.preferences.notify('Food')" id="Food">
+                                Restauracje
+                            </a>
+                        </div>
                     </li>
+
                 </ul>
                 <div class="col s12">
                     <p id="savingButton" style="visibility: hidden">
-                        <a class="waves-effect waves-light btn" onclick="app.trip.save()">
+                        <a class="waves-effect waves-light btn  green darken-2" onclick="app.trip.save()">
                             <i class="material-icons right">play_for_work</i>Zapisz
                         </a>
                     </p>

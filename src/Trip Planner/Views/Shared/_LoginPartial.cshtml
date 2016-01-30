@@ -3,8 +3,8 @@
 @if (User.Identity.IsAuthenticated)
 {
     <ul class="right hide-on-med-and-down">
-        <li><a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a></li>
-        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log out</button></form></li>
+        <li><a asp-controller="Manage" asp-action="Index" title="Manage" class="white-text btn modal-trigger-sign-in blue-grey darken-4" style="margin-left:5px; margin-right:5px">Hello @User.GetUserName()!</a></li>
+        <li><form asp-controller="Account" asp-action="LogOff" method="post"><button type="submit" class="white-text btn modal-trigger-sign-in blue-grey darken-4" style="margin-left:5px; margin-right:5px">Log out</button></form></li>
     </ul>
     
     <ul id="nav-mobile" class="side-nav">
@@ -16,8 +16,8 @@
 else
 {
     <ul class="right hide-on-med-and-down">
-        <li><a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Sign in</a></li>
-        <li><a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in" style="margin-left:5px; margin-right:5px">Log in</a></li>
+        <li><a asp-controller="Account" asp-action="Register" class="white-text btn modal-trigger-sign-in blue-grey darken-4" style="margin-left:5px; margin-right:5px">Sign in</a></li>
+        <li><a asp-controller="Account" asp-action="Login" class="white-text btn modal-trigger-sign-in blue-grey darken-4" style="margin-left:5px; margin-right:5px">Log in</a></li>
     </ul>
 
     <ul id="nav-mobile" class="side-nav">
