@@ -24,12 +24,12 @@
         <div class="container">
             <h1 class="header center shades-text text-darken-1">Trip Planner</h1>
             <div class="row center">
-                <h5 class="header col s12 light">An app for planning trip in any city you want!</h5>
+                <h5 class="header col s12 light">Szybko i przyjemnie zaplanuj czas!</h5>
             </div>
             <div class="row center">
             @if (User.Identity.IsAuthenticated)
             {
-                <a asp-controller="TripMap" asp-action="TripMap" id="download-button" class="btn-large waves-effect waves-light light-blue darken-3">Get Started</a>
+                <a asp-controller="TripMap" asp-action="TripMap" id="download-button" class="btn-large waves-effect waves-light light-blue darken-3">Stwórz wycieczkę</a>
             }
             else
             {
