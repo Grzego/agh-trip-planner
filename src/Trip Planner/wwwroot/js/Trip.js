@@ -108,10 +108,12 @@
     // -----
 
     this.setVisible = function (flag) {
-        startPoint.marker.setVisible(flag);
-        endPoint.marker.setVisible(flag);
-        for (var i = 0; i < waypoints.length; ++i) {
-            waypoints[i].marker.setVisible(flag);
+        if (startPoint && endPoint) {
+            startPoint.marker.setVisible(flag);
+            endPoint.marker.setVisible(flag);
+            for (var i = 0; i < waypoints.length; ++i) {
+                waypoints[i].marker.setVisible(flag);
+            }
         }
     };
 
