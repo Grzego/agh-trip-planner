@@ -11,6 +11,7 @@
         map: self.map,
         preserveViewport: true,
         suppressMarkers: true,
+        panel: document.getElementById('tripRoute')
     });
 };
 
