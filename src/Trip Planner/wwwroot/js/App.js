@@ -140,6 +140,8 @@ function App (id) {
                     self.trip.generate(self.services);
                     action && action();
                 });
+                placeButton.mouseEnter();
+                placeButton.mouseLeave();
 
                 infodiv.appendChild(placeButton.getContent());
 
