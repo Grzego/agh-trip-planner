@@ -12,16 +12,24 @@ var MarkerFlyweightFactory = new function () {
 
     this.create = function (map, place, callback) {
         if (!markers[place.place_id]) {
-            console.log('nowy marker');
+            console.log('nowy marker ' + place.icon);
+
+            var icon = {
+                url: place.icon,
+                scaledSize: new google.maps.Size(30, 30),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(0, 0)
+            };
+
             var marker = new google.maps.Marker({
                 map: map,
-                position: place.geometry.location
-                // icon: <-- can be set with... marker.marker.setIcon('...');
+                position: place.geometry.location,
+                icon: icon
             });
 
             var markerData = new MarkerFlyweight(marker, place);
             markerData.listener = google.maps.event.addListener(marker, 'click', function () {
-                callback(markerData);
+                callback && callback(markerData);
             });
             markers[place.place_id] = markerData;
 
@@ -34,7 +42,7 @@ var MarkerFlyweightFactory = new function () {
             // ----
             google.maps.event.removeListener(marker.listener);
             marker.listener = google.maps.event.addListener(marker.marker, 'click', function () {
-                callback(marker);
+                callback && callback(marker);
             });
 
             return marker;

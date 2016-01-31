@@ -1,11 +1,11 @@
-﻿function Services (initState) { // TODO: pokombinowac jeszcze
+﻿function Services () { // TODO: pokombinowac jeszcze
     var self = this;
 
     // -----
 
     this.map = new MapProxy();
     this.places = new PlaceServiceProxy(self.map);
-    this.autocomplete = new AutocompleteCitiesProxy(initState);
+    this.autocomplete = new AutocompleteCitiesProxy();
     this.directions = new google.maps.DirectionsService();
     this.directionsDisplay = new google.maps.DirectionsRenderer({
         map: self.map,
@@ -67,22 +67,73 @@ function PlaceServiceProxy(map) {
     };
 
     // ---
-    this.details = function (place, continuation) {
-        if (_details[place.place_id]) {
-            continuation(_details[place.place_id]);
+    this.details = function (placeId, continuation) {
+        if (_details[placeId]) {
+            continuation(_details[placeId]);
         } else {
-            var request = { placeId: place.place_id };
+            var request = { placeId: placeId };
             placeService.getDetails(request, function (results, status) {
                 if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                    // show error xD or something
+                    console.log('Api error.');
                     return;
                 }
-
                 // -----
-                _details[place.place_id] = results;
+                _details[placeId] = results;
                 continuation(results);
             });
         }
+    };
+};
+
+// -----
+// -----
+
+function AutocompleteCitiesProxy() {
+    var self = this;
+    // -----
+    var defaultBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(-90, -180),
+        new google.maps.LatLng(90, 180));
+
+    var autocompleteOptions = {
+        bounds: defaultBounds,
+        types: ['(cities)']
+    };
+
+    var autocomplete = new google.maps.places.Autocomplete(document.getElementById('city_poc'), autocompleteOptions);
+    var locationChangedEvent = null;
+    var listener = null;
+
+    this.onCityChange = function (locationChanged) {
+        console.log('changed');
+        locationChangedEvent = locationChanged;
+        if (listener) {
+            google.maps.event.removeListener(listener);
+        }
+        listener = google.maps.event.addListener(autocomplete, 'place_changed', locationChangedEvent);
+    };
+
+    this.setCity = function (city) {
+        console.log(autocomplete);
+        var copy = locationChangedEvent;
+        self.onCityChange(function () { console.log("test"); console.log(autocomplete.getPlace()); });
+        $('#city_poc').trigger('focus');
+        $('#city_poc').val(city);
+        //document.getElementById('city_poc').value = city;
+        //$('#city_poc').trigger('focus');
+        //var e = $.Event("keydown");
+        //e.which = 32;
+        //$('#city_poc').trigger(e);
+        //e.which = 40;
+        //$('#city_poc').trigger(e);
+        //e.which = 13;
+        //$('#city_poc').trigger(e);
+        //google.maps.event.trigger(autocomplete, 'place_changeed');
+        self.onCityChange(copy);
+    };
+
+    this.getPlace = function () {
+        return autocomplete.getPlace();
     };
 };
 
@@ -95,7 +146,7 @@ function generateContent(details) {
         (details.formatted_address ? details.formatted_address + "<br />" : "") +
         (details.formatted_phone_number ? details.formatted_phone_number + "<br />" : "") +
         (details.website ? "<a href=" + details.website + ">" + details.website + "</a><br />" : "");
-    if (details.photos) { // FIX: nie wiedziec czemu nie wczytuje obrazkow
+    if (details.photos) {
         var photoURL = details.photos[0].getUrl({ 'maxWidth': 1200, 'maxHeight': 700 });
         console.log(photoURL);
         content += "<img width=\"240\" src=\"" + photoURL + "\"/><br />";
@@ -114,29 +165,3 @@ function generateContentImageless(details) {
     return content;
 };
 
-// -----
-// -----
-
-function AutocompleteCitiesProxy(locationChanged) {
-    var defaultBounds = new google.maps.LatLngBounds(
-        new google.maps.LatLng(-90, -180),
-        new google.maps.LatLng(90, 180));
-
-    var autocompleteOptions = {
-        bounds: defaultBounds,
-        types: ['(cities)']
-    };
-
-    var autocomplete = new google.maps.places.Autocomplete(document.getElementById('city_poc'), autocompleteOptions);
-    google.maps.event.addListener(autocomplete, 'place_changed', function () {
-        // var place = autocomplete.getPlace();
-        // map.panTo(place.geometry.location);
-        locationChanged();
-    });
-
-    return {
-        getPlace: function () {
-            return autocomplete.getPlace();
-        }
-    };
-};

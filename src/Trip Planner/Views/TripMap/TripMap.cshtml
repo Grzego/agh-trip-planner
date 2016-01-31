@@ -12,7 +12,7 @@
             <br /> <!-- Prowizorka -->
             <div class="input-field col s12">
                 <i class="material-icons prefix">room</i>
-                <input asp-for="City" id="city_poc" type="text">
+                <input asp-for="City" id="city_poc" type="text" placeholder="">
                 <label asp-for="City" for="city_poc"></label>
             </div>
             @*<div class="col s12">
@@ -26,7 +26,7 @@
             </div>*@
             <!--tabsy-->
             <ul class="tabs">
-                <li class="tab col s1"><a style="color: #d50000;" href="#preferencje">Preferencje</a></li>
+                <li class="tab col s1"><a style="color: #d50000;" onclick="app.preferences.hidePlaces()" href="#preferencje">Preferencje</a></li>
                 <li class="tab col s1"><a style="color: #d50000;" href="#placesCards">Lista miejsc</a></li>
                 <div class="indicator  red accent-4" style="z-index:1"></div>
             </ul>
@@ -108,9 +108,8 @@
                 </ul>
                 <div class="col s12">
                     <p id="savingButton" style="visibility: hidden">
-                        <a class="waves-effect waves-light btn  green darken-2" onclick="app.trip.save()">
-                            <i class="material-icons right">play_for_work</i>Zapisz
-                        </a>
+                        <a class="waves-effect waves-light btn  green darken-2" onclick="app.trip.save(app.services.autocomplete.getPlace())">
+                            <i class="material-icons right">play_for_work</i>Zapisz</a>
                     </p>
                 </div>
             </div>
@@ -161,7 +160,7 @@
         google.maps.event.addDomListener(window, 'load', function () {
             // jesli jest jakis get to pobierz z serwera sciezke i wyswietl
             var id = getUrlParameter('id');
-            app = new App();
+            app = new App(id);
         });
 
 

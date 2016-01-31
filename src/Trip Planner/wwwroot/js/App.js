@@ -1,12 +1,16 @@
 ﻿//--------
 //--------
 
-function App () {
+function App (id) {
+    var self = this;
+
+    // -----
+
     this.chooseStartEnd = function () {
         Materialize.toast("Wybierz gdzie chcesz rozpocząć i zakończyć wycieczkę", 10000);
 
-        self.trip = new Trip(self.tripGeneration);
-        self.trip.setCity(self.services.autocomplete.getPlace().formatted_address);
+        self.trip.clearTrip();
+        self.services.directionsDisplay.set('directions', null);
         self.services.map.panTo(self.services.autocomplete.getPlace().geometry.location);
 
         var request = {
@@ -19,7 +23,7 @@ function App () {
 
         self.services.places.nearbySearch(request, function (result) {
             startEndMarkers.append(MarkerFlyweightFactory.create(self.services.map, result, function (marker) {
-                self.services.places.details(marker.place, function (details) {
+                self.services.places.details(marker.place.place_id, function (details) {
                     var infodiv = document.createElement('div');
                     infodiv.innerHTML = generateContent(details);
 
@@ -118,7 +122,7 @@ function App () {
 
     this.addToTripMark = function (place, action) {
         return MarkerFlyweightFactory.create(self.services.map, place, function (marker) {
-            self.services.places.details(marker.place, function (details) {
+            self.services.places.details(marker.place.place_id, function (details) {
                 var infodiv = document.createElement('div');
                 infodiv.innerHTML = generateContent(details);
 
@@ -133,12 +137,9 @@ function App () {
                     } else {
                         self.trip.removePlace(marker);
                     }
-                    infowindow.close();
                     self.trip.generate(self.services);
                     action && action();
                 });
-                placeButton.mouseEnter();
-                placeButton.mouseLeave();
 
                 infodiv.appendChild(placeButton.getContent());
 
@@ -151,8 +152,24 @@ function App () {
     // -----
 
     this.preferences = null;
-    this.trip = null;
-    this.services = new Services(this.chooseStartEnd);
+    this.services = new Services();
+
+    this.trip = new Trip(function () {
+        infowindow.close();
+        self.tripGeneration();
+    });
+
+    // -----
+    // -----
+
+    this.services.autocomplete.onCityChange(this.chooseStartEnd);
+
+    if (id !== undefined) {
+        this.trip.load(this.services, id, function () {
+            console.log(self.trip.getCity());
+            self.preferences = new Preferences(self);
+        });
+    }
 
     // -----
 
@@ -162,5 +179,4 @@ function App () {
     // -----
 
     var infowindow = new google.maps.InfoWindow({ maxWidth: 240 });
-    var self = this;
 };

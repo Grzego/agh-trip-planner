@@ -41,8 +41,20 @@ namespace Trip_Planner.Controllers
 			_applicationDbContext.Add(tripData);
 
 			await _applicationDbContext.SaveChangesAsync();
-
+			
             return Json(new { saved = true });
+		}
+
+		[HttpPost]
+		public IActionResult GetPath(int id)
+		{
+			TripDataViewModel tdvm = _applicationDbContext.Trips.Where(t => t.TripDataID == id).FirstOrDefault();
+			return Json(new {
+				City = tdvm.City,
+				StartPlace = tdvm.StartPlace,
+				EndPlace = tdvm.EndPlace,
+				Waypoints = tdvm.Waypoints
+			});
 		}
     }
 }

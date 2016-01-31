@@ -1,4 +1,4 @@
-﻿function Trip(nextState) {
+﻿function Trip (afterSelection) {
     var self = this;
     var city = null;
     var startPoint = null;
@@ -9,6 +9,12 @@
 
     this.setCity = function (cityName) {
         city = cityName;
+    };
+
+    // -----
+
+    this.getCity = function () {
+        return city;
     };
 
     // -----
@@ -39,10 +45,21 @@
 
     // -----
 
+    this.clearTrip = function () {
+        self.setVisible(false);
+        city = null;
+        startPoint = null;
+        endPoint = null;
+        waypoints = [];
+    };
+
+    // -----
+
     this.checkIfDone = function () {
         if (startPoint != null && endPoint != null) {
-            // change listeners in markers
-            nextState();
+            google.maps.event.removeListener(startPoint.listener);
+            google.maps.event.removeListener(endPoint.listener);
+            afterSelection();
         }
     };
 
@@ -100,30 +117,31 @@
 
     // -----
 
-    this.save = function (continuation) {
-        var start = convertMarker(startPoint);
-        var end = convertMarker(endPoint);
-        var waips = waypoints.map(convertMarker);
-
-        console.log({
-            City: city,
-            StartPlace: start,
-            EndPlace: end,
-            Waypoints: waips
+    this.save = function (place) {
+        var start = startPoint.place.place_id;
+        var end = endPoint.place.place_id;
+        var waips = waypoints.map(function (item) {
+            return item.place.place_id;
         });
+
+        // TODO: ask for description, and show "saved" message after save
 
         $.ajax({
             type: "POST",
-            url: "TripMap/SavePath",
+            url: "/TripMap/SavePath",
             data: {
-                City: city,
+                City: place.formatted_address,
                 StartPlace: start,
                 EndPlace: end,
                 Waypoints: waips
             },
-            success: function () {
-                console.log("Data sended.");
-                continuation && continuation();
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.saved) {
+                    Materialize.toast("Wycieczka zapisana.", 2000);
+                    // TODO: modal or something.
+                }                
             },
             error: function (error) {
                 console.log(error);
@@ -133,8 +151,47 @@
 
     // -----
 
-    this.load = function () {
-        // -----
-
+    this.load = function (services, _id, continuation) {
+        console.log(_id);
+        $.ajax({
+            type: "POST",
+            url: "/TripMap/GetPath",
+            data: "id=" + _id,
+            dataType: 'json',
+            success: function (data) {
+                console.log('data');
+                console.log(data);
+                city = data.City;
+                services.autocomplete.setCity(city);
+                // -----
+                services.places.details(data.StartPlace, function (details) {
+                    startPoint = MarkerFlyweightFactory.create(services.map, details);
+                    // -----
+                    services.places.details(data.EndPlace, function (details) {
+                        endPoint = MarkerFlyweightFactory.create(services.map, details);
+                        // -----
+                        if (data.Waypoints) {
+                            for (var i = 0; i < data.Waypoints; ++i) {
+                                services.places.details(item, function (details) {
+                                    waypoints.append(MarkerFlyweightFactory.create(services.map, details));
+                                    if (waypoints.length == data.Weypoints.length) {
+                                        self.generate(services);
+                                        self.setVisible(true);
+                                        continuation && continuation();
+                                    }
+                                });
+                            }
+                        } else {
+                            self.generate(services);
+                            self.setVisible(true);
+                            continuation && continuation();
+                        }
+                    });
+                });
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
     };
 };

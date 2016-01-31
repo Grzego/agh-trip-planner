@@ -9,8 +9,8 @@ namespace Trip_Planner.ViewModels.TripMap
     public class TripDataViewModel
     {
 		public string City { get; set; }
-        public LatLng StartPlace { get; set; }
-        public LatLng EndPlace { get; set; }
-        public List<LatLng> Waypoints { get; set; }
-    }
+        public string StartPlace { get; set; }
+        public string EndPlace { get; set; }
+        public List<string> Waypoints { get; set; }
+	}
 }

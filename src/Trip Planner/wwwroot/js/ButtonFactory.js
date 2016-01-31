@@ -1,4 +1,28 @@
-﻿
+﻿function Button(button, onClickAction, mouseEnterAction, mouseLeaveAction, getContentAction) {
+    this.onClick = function (action) {
+        $(button).click(function () {
+            onClickAction && onClickAction(action);
+        });
+    },
+
+    this.mouseEnter = function (action) {
+        $(button).mouseenter(function () {
+            mouseEnterAction && mouseEnterAction(action);
+        });
+    },
+
+    this.mouseLeave = function (action) {
+        $(button).mouseleave(function () {
+            mouseLeaveAction && mouseLeaveAction(action);
+        });
+    },
+
+    this.getContent = getContentAction;
+};
+
+
+// -----
+
 
 var ButtonFactory = new function () {
     this.createAddRemoveButton = function (defaultText, addText, removeText, state) {
@@ -54,44 +78,34 @@ var ButtonFactory = new function () {
 
         // -----
 
-        return {
-            onClick: function (action) {
-                $(button).click(function () {
-                    action && action();
-                    if (currentState === 'add') {
-                        currentState = 'done';
-                    } else {
-                        currentState = 'add';
-                    }
-                    // -----
+        return new Button(button,
+            function (action) {
+                action && action();
+                if (currentState === 'add') {
+                    currentState = 'done';
+                } else {
+                    currentState = 'add';
+                }
+                // -----
+                changeState();
+            },
+            function (action) {
+                action && action();
+                if (currentState === 'done') {
+                    currentState = 'delete';
                     changeState();
-                });
+                }
             },
-
-            mouseEnter: function (action) {
-                $(button).mouseenter(function () {
-                    action && action();
-                    if (currentState === 'done') {
-                        currentState = 'delete';
-                        changeState();
-                    }
-                });
+            function (action) {
+                action && action();
+                if (currentState === 'delete') {
+                    currentState = 'done';
+                    changeState();
+                }
             },
-
-            mouseLeave: function (action) {
-                $(button).mouseleave(function () {
-                    action && action();
-                    if (currentState === 'delete') {
-                        currentState = 'done';
-                        changeState();
-                    }
-                });
-            },
-
-            getContent: function () {
+            function () {
                 return content;
-            }
-        };
+            });
     };
 
     this.createAddButton = function (defaultText) {
@@ -120,38 +134,19 @@ var ButtonFactory = new function () {
 
         // -----
 
-        $(button).click(function () { });
-        $(button).mouseenter(function () { });
-        $(button).mouseleave(function () { });
-
-        // -----
-
-        return {
-            onClick: function (action) {
-                $(button).click(function () {
-                    action && action();
-                    // there can be some additions
-                });
+        return new Button(button,
+            function (action) {
+                action && action();
             },
-
-            mouseEnter: function (action) {
-                $(button).mouseenter(function () {
-                    action && action();
-                    // there can be some additions
-                });
+            function (action) {
+                action && action();
             },
-
-            mouseLeave: function (action) {
-                $(button).mouseleave(function () {
-                    action && action();
-                    // there can be some additions
-                });
+            function (action) {
+                action && action();
             },
-
-            getContent: function () {
+            function () {
                 return content;
-            }
-        };
+            });
     };
 };
 

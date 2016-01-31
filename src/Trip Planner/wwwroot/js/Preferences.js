@@ -1,15 +1,7 @@
 ﻿function Preferences(app) {
     this.notify = function (kind) {
-        // hide all markers
-        for (var m in markers) {
-            markers[m].visible(false);
-        }
-        // remove all cards
+        self.hidePlaces();
         var node = document.getElementById("placesCards");
-        while (node.firstChild) {
-            node.removeChild(node.firstChild);
-        }
-        
 
         if (!markers[kind]) {
             markers[kind] = new MarkerCollection();
@@ -19,8 +11,8 @@
                 location: app.services.autocomplete.getPlace().geometry.location,
                 radius: 20000,
                 types: placeMap[kind]
-            }, function (result) {
-                var markerData = app.addToTripMark(result);
+            }, function (place) {
+                var markerData = app.addToTripMark(place);
                 markers[kind].append(markerData);
 
                 //dodanie buttonow
@@ -44,7 +36,7 @@
                 //tworzenie karty i dodanie do taba
                 var card = CardFactory.createCard(markerData);
                 card.onClick = function () {
-                    app.services.places.details(result, function (details) {
+                    app.services.places.details(place.place_id, function (details) {
                         card.setContent(generateContentImageless(details));
                         card.appendButton(cardButton);
                     });
@@ -71,6 +63,22 @@
 
     // -----
 
+    this.hidePlaces = function () {
+        // hide all markers
+        for (var m in markers) {
+            markers[m].visible(false);
+        }
+        // remove all cards
+        var node = document.getElementById("placesCards");
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+
+        app.trip.setVisible(true);
+    };
+
+    // -----
+
     var markers = {};
     var cards = {};
 
@@ -83,4 +91,6 @@
         'Cinema': ['movie_theater'],
         //'Fun': ['amusement_park', 'zoo']
     };
+
+    var self = this;
 };
