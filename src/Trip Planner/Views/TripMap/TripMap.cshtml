@@ -26,8 +26,9 @@
             </div>*@
             <!--tabsy-->
             <ul class="tabs">
-                <li class="tab col s1"><a style="color: #d50000;" href="#preferencje">Preferencje</a></li>
-                <li class="tab col s1"><a style="color: #d50000;" href="#placesCards">Lista miejsc</a></li>
+                <li class="tab col s0"><a style="color: #d50000; font-size:13px;" href="#preferencje">Preferencje</a></li>
+                <li class="tab col s0"><a style="color: #d50000; font-size:13px;" href="#placesCards">Lista miejsc</a></li>
+                <li class="tab col s0"><a style="color: #d50000; font-size:13px;" href="#tripPanel">Trasa</a></li>              
                 <div class="indicator  red accent-4" style="z-index:1"></div>
             </ul>
             <!--tabsy-->
@@ -115,6 +116,9 @@
                 </div>
             </div>
             <div id="placesCards" class="col s12" style="height: 90vh; overflow: auto;">
+            </div>
+            <div id="tripPanel" style="height: 90vh; overflow: auto;">
+                <p>Całkowity dystans: <span id="total"></span></p>
             </div>
 
         </form>

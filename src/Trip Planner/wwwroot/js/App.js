@@ -16,6 +16,7 @@ function App () {
         };
 
         // TODO: add ability to choose anywhere
+        
 
         self.services.places.nearbySearch(request, function (result) {
             startEndMarkers.append(MarkerFlyweightFactory.create(self.services.map, result, function (marker) {
@@ -66,6 +67,14 @@ function App () {
         self.trip.setVisible(true);
 
         self.preferences = new Preferences(self);
+
+        //wywolanie obliczenia dystansu, nie dziala, nie wiem gdzie to powinno byc
+        //self.services.directionsDisplay.addListener('directions_changed', function () {
+        //    self.trip.computeTotalDistance(self.services.directionsDisplay.getDirections());
+        //});
+        //-------------------------------------------------------------------------------
+
+
 
         google.maps.event.addListener(self.services.map, "rightclick", function (event) {
             optionalMarkers.clear();

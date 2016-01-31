@@ -10,6 +10,7 @@
     this.directionsDisplay = new google.maps.DirectionsRenderer({
         map: self.map,
         preserveViewport: true,
+        panel: document.getElementById('tripPanel'),      
         suppressMarkers: true,
     });
 };
