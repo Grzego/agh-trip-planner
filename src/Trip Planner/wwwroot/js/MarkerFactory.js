@@ -4,7 +4,7 @@
     this.listener = null;
 };
 
-var MarkerFlyweightFactory = new function () {
+var MarkerFactory = new function () {
     var self = this;
     var markers = {};
 

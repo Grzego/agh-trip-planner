@@ -22,7 +22,7 @@ function App (id) {
         // TODO: add ability to choose anywhere
 
         self.services.places.nearbySearch(request, function (result) {
-            startEndMarkers.append(MarkerFlyweightFactory.create(self.services.map, result, function (marker) {
+            startEndMarkers.append(MarkerFactory.create(self.services.map, result, function (marker) {
                 self.services.places.details(marker.place.place_id, function (details) {
                     var infodiv = document.createElement('div');
                     infodiv.innerHTML = generateContent(details);
@@ -121,7 +121,7 @@ function App (id) {
     // -----
 
     this.addToTripMark = function (place, action) {
-        return MarkerFlyweightFactory.create(self.services.map, place, function (marker) {
+        return MarkerFactory.create(self.services.map, place, function (marker) {
             self.services.places.details(marker.place.place_id, function (details) {
                 var infodiv = document.createElement('div');
                 infodiv.innerHTML = generateContent(details);

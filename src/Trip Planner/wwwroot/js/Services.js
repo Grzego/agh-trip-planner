@@ -104,6 +104,9 @@ function AutocompleteCitiesProxy() {
     var autocomplete = new google.maps.places.Autocomplete(document.getElementById('city_poc'), autocompleteOptions);
     var locationChangedEvent = null;
     var listener = null;
+    var selectedPlace = null;
+
+    // -----
 
     this.onCityChange = function (locationChanged) {
         console.log('changed');
@@ -111,30 +114,22 @@ function AutocompleteCitiesProxy() {
         if (listener) {
             google.maps.event.removeListener(listener);
         }
-        listener = google.maps.event.addListener(autocomplete, 'place_changed', locationChangedEvent);
+        listener = google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            selectedPlace = autocomplete.getPlace();
+            locationChangedEvent();
+        });
     };
 
-    this.setCity = function (city) {
+    this.setPlace = function (place) {
         console.log(autocomplete);
-        var copy = locationChangedEvent;
-        self.onCityChange(function () { console.log("test"); console.log(autocomplete.getPlace()); });
-        $('#city_poc').trigger('focus');
-        $('#city_poc').val(city);
-        //document.getElementById('city_poc').value = city;
-        //$('#city_poc').trigger('focus');
-        //var e = $.Event("keydown");
-        //e.which = 32;
-        //$('#city_poc').trigger(e);
-        //e.which = 40;
-        //$('#city_poc').trigger(e);
-        //e.which = 13;
-        //$('#city_poc').trigger(e);
-        //google.maps.event.trigger(autocomplete, 'place_changeed');
-        self.onCityChange(copy);
+        // -----
+        $('#city_poc').val(place.formatted_address);
+
+        selectedPlace = place;
     };
 
     this.getPlace = function () {
-        return autocomplete.getPlace();
+        return selectedPlace;
     };
 };
 

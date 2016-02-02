@@ -133,6 +133,7 @@
             url: "/TripMap/SavePath",
             data: {
                 City: place.formatted_address,
+                CityId: place.place_id,
                 StartPlace: start,
                 EndPlace: end,
                 Waypoints: waips
@@ -163,19 +164,21 @@
             success: function (data) {
                 console.log('data');
                 console.log(data);
-                city = data.City;
-                services.autocomplete.setCity(city);
+                // -----
+                services.places.details(data.CityId, function (details) {
+                    services.autocomplete.setPlace(details);
+                });                
                 // -----
                 services.places.details(data.StartPlace, function (details) {
-                    startPoint = MarkerFlyweightFactory.create(services.map, details);
+                    startPoint = MarkerFactory.create(services.map, details);
                     // -----
                     services.places.details(data.EndPlace, function (details) {
-                        endPoint = MarkerFlyweightFactory.create(services.map, details);
+                        endPoint = MarkerFactory.create(services.map, details);
                         // -----
                         if (data.Waypoints) {
                             for (var i = 0; i < data.Waypoints; ++i) {
                                 services.places.details(item, function (details) {
-                                    waypoints.append(MarkerFlyweightFactory.create(services.map, details));
+                                    waypoints.append(MarkerFactory.create(services.map, details));
                                     if (waypoints.length == data.Weypoints.length) {
                                         self.generate(services);
                                         self.setVisible(true);

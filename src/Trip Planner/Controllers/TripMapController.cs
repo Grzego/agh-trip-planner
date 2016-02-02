@@ -51,6 +51,7 @@ namespace Trip_Planner.Controllers
 			TripDataViewModel tdvm = _applicationDbContext.Trips.Where(t => t.TripDataID == id).FirstOrDefault();
 			return Json(new {
 				City = tdvm.City,
+				CityId = tdvm.CityId,
 				StartPlace = tdvm.StartPlace,
 				EndPlace = tdvm.EndPlace,
 				Waypoints = tdvm.Waypoints
