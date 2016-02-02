@@ -10,6 +10,7 @@ namespace Trip_Planner.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 		public virtual DbSet<TripData> Trips { get; set; }
+		public virtual DbSet<Waypoint> Waypoints { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
         {

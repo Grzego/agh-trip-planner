@@ -170,6 +170,7 @@ function App (id) {
         this.trip.load(this.services, id, function () {
             console.log(self.trip.getCity());
             self.preferences = new Preferences(self);
+            self.tripGeneration();
         });
     }
 

@@ -34,11 +34,17 @@ namespace Trip_Planner.Controllers
         }
 
 		[HttpPost]
-		public async Task<IActionResult> SavePath(TripData tripData)
+		public async Task<IActionResult> SavePath(TripDataViewModel tripData)
 		{
-			tripData.User = await _userManager.FindByIdAsync(User.GetUserId());
+			var _tripData = new TripData();
+			_tripData.User = await _userManager.FindByIdAsync(User.GetUserId());
+			_tripData.City = tripData.City;
+			_tripData.CityId = tripData.CityId;
+			_tripData.StartPlace = tripData.StartPlace;
+			_tripData.EndPlace = tripData.EndPlace;
+			_tripData.Waypoints = tripData.Waypoints.Select(t => new Waypoint(t)).ToList();
 
-			_applicationDbContext.Add(tripData);
+			_applicationDbContext.Add(_tripData);
 
 			await _applicationDbContext.SaveChangesAsync();
 			
@@ -48,13 +54,14 @@ namespace Trip_Planner.Controllers
 		[HttpPost]
 		public IActionResult GetPath(int id)
 		{
-			TripDataViewModel tdvm = _applicationDbContext.Trips.Where(t => t.TripDataID == id).FirstOrDefault();
+			var tdvm = _applicationDbContext.Trips.Include(t => t.Waypoints).Single(t => t.TripDataID == id);
+
 			return Json(new {
 				City = tdvm.City,
 				CityId = tdvm.CityId,
 				StartPlace = tdvm.StartPlace,
 				EndPlace = tdvm.EndPlace,
-				Waypoints = tdvm.Waypoints
+				Waypoints = tdvm.Waypoints.Select(t => t.Place).ToList()
 			});
 		}
     }

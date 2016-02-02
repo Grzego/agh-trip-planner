@@ -18,14 +18,14 @@
             @foreach (var tripData in Model)
             {
                 <li class="collection-item avatar">
-                    <img src="http://profile.ak.fbcdn.net/hprofile-ak-ash2/1086986_555946194497229_720309508_q.jpg" alt="" class="circle">
+                    <img src="~/icons/map-7-64x64.png" alt="" class="circle">
                     <span class="title">@tripData.City</span>
                     <p>
                         @*@tripData.Description*@
                     </p>
                     @*<a asp-controller="TripMap" asp-action="TripMap" asp></a>*@
                     @*<a href="TripMap/TripMap/" + @tripData.TripDataID class="secondary-content"><i class="material-icons medium">send</i></a>*@
-                    @Html.Raw("<a href=\"/TripMap/TripMap/?id=" + tripData.TripDataID + "\"><i class=\"material-icons medium\">send</i></a>");
+                    @Html.Raw("<a href=\"/TripMap/TripMap/?id=" + tripData.TripDataID + "\"><i class=\"material-icons small\">send</i></a>")
                 </li>
             }
         </ul>

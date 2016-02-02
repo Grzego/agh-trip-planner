@@ -126,6 +126,8 @@
             return item.place.place_id;
         });
 
+        console.log(waips);
+
         // TODO: ask for description, and show "saved" message after save
 
         $.ajax({
@@ -175,11 +177,12 @@
                     services.places.details(data.EndPlace, function (details) {
                         endPoint = MarkerFactory.create(services.map, details);
                         // -----
-                        if (data.Waypoints) {
-                            for (var i = 0; i < data.Waypoints; ++i) {
-                                services.places.details(item, function (details) {
-                                    waypoints.append(MarkerFactory.create(services.map, details));
-                                    if (waypoints.length == data.Weypoints.length) {
+                        if (data.Waypoints !== undefined) {
+                            debugger;
+                            for (var i = 0; i < data.Waypoints.length; ++i) {
+                                services.places.details(data.Waypoints[i], function (details) {
+                                    waypoints.push(MarkerFactory.create(services.map, details));
+                                    if (waypoints.length == data.Waypoints.length) {
                                         self.generate(services);
                                         self.setVisible(true);
                                         continuation && continuation();

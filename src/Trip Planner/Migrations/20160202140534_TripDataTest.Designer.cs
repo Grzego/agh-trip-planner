@@ -8,9 +8,10 @@ using Trip_Planner.Models;
 namespace Trip_Planner.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160202140534_TripDataTest")]
+    partial class TripDataTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .Annotation("ProductVersion", "7.0.0-beta8-15964")
@@ -161,18 +162,6 @@ namespace Trip_Planner.Migrations
                     b.HasKey("TripDataID");
                 });
 
-            modelBuilder.Entity("Trip_Planner.Models.Waypoint", b =>
-                {
-                    b.Property<int>("WaypointID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Place");
-
-                    b.Property<int?>("TripDataTripDataID");
-
-                    b.HasKey("WaypointID");
-                });
-
             modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNet.Identity.EntityFramework.IdentityRole")
@@ -210,13 +199,6 @@ namespace Trip_Planner.Migrations
                     b.HasOne("Trip_Planner.Models.ApplicationUser")
                         .WithMany()
                         .ForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Trip_Planner.Models.Waypoint", b =>
-                {
-                    b.HasOne("Trip_Planner.Models.TripData")
-                        .WithMany()
-                        .ForeignKey("TripDataTripDataID");
                 });
         }
     }
